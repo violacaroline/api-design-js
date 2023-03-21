@@ -1,5 +1,5 @@
 /**
- * Module for TaskRepository.
+ * Module for LocationRepository.
  *
  * @author Andrea Viola Caroline Åkesson
  * @version 1.0.0

@@ -34,7 +34,7 @@ export class IoCContainer {
    * @param {boolean} options.singleton - ...
    * @param {boolean} options.type - ...
    */
-  register (name, definition, { dependencies, singleton = false, type = false } = {}) {
+  register (name, definition, { dependencies = [], singleton = false, type = false } = {}) {
     this.#services.set(
       name,
       {
@@ -53,6 +53,10 @@ export class IoCContainer {
    */
   resolve (name) {
     const service = this.#services.get(name)
+
+    if (!service) {
+      throw new Error(`Service '${name}' not found.`)
+    }
 
     // Return the value.
     if (typeof service.definition !== 'function' || service.type) {

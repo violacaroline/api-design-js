@@ -6,7 +6,6 @@
  */
 
 import mongoose from 'mongoose'
-import mongooseLeanVirtuals from 'mongoose-lean-virtuals'
 
 // Create a schema.
 const schema = new mongoose.Schema({
@@ -16,50 +15,29 @@ const schema = new mongoose.Schema({
     trim: true,
     minlength: 1
   }
-}, {
-  timestamps: true,
-  toObject: {
-    virtuals: true, // ensure virtual fields are serialized
-    /**
-     * Performs a transformation of the resulting object to remove sensitive information.
-     *
-     * @param {object} doc - The mongoose document which is being converted.
-     * @param {object} ret - The plain object representation which has been converted.
-     */
-    transform: function (doc, ret) {
-      delete ret.__v
-      delete ret._id
-    }
-  }
 })
 
 schema.virtual('id').get(function () {
   return this._id.toHexString()
 })
 
-schema.plugin(mongooseLeanVirtuals)
-
-schema.post(['find', 'findOne', 'findOneAndUpdate', 'findOneAndDelete'], function (res) {
-  if (!res || !this.mongooseOptions().lean) {
-    return
-  }
-
+const convertOptions = {
+  virtuals: true,
+  versionKey: false,
   /**
-   * Performs a transformation of the resulting lean object.
+   * Performs a transformation of the resulting object to remove sensitive information.
    *
-   * @param {object} obj - The object to transform.
+   * @param {object} doc - The mongoose document which is being converted.
+   * @param {object} ret - The plain object representation which has been converted.
    */
-  const transformLeanObject = (obj) => {
-    delete obj._id
-    delete obj.__v
+  transform: (doc, ret) => {
+    delete ret._id
   }
+}
 
-  if (Array.isArray(res)) {
-    res.forEach(transformLeanObject)
-  } else {
-    transformLeanObject(res)
-  }
-})
+schema.set('timestamps', true)
+schema.set('toObject', convertOptions)
+schema.set('toJSON', convertOptions)
 
 // Create a model using the schema.
 export const LocationModel = mongoose.model('Location', schema)

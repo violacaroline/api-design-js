@@ -29,5 +29,8 @@ router.get('/:id', (req, res, next) => resolveLocationController(req).find(req, 
 // POST location
 router.post('/', (req, res, next) => resolveLocationController(req).create(req, res, next))
 
+// PUT tasks/:id
+router.put('/:id', (req, res, next) => resolveLocationController(req).update(req, res, next))
+
 // DELETE location/:id
 router.delete('/:id', (req, res, next) => resolveLocationController(req).delete(req, res, next))

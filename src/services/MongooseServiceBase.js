@@ -50,6 +50,8 @@ export class MongooseServiceBase {
   }
 
   /**
+   * MIGHT NOT NEED???
+   *
    * Updates a document.
    *
    * @param {number} id - The value of the id for the document to update.
@@ -58,6 +60,17 @@ export class MongooseServiceBase {
    */
   async update (id, newData) {
     return this._repository.update(id, newData)
+  }
+
+  /**
+   * Replaces a document.
+   *
+   * @param {string} id - The value of the id for the document to update.
+   * @param {object} replaceData - The new data to replace the existing document with.
+   * @returns {Promise<object>} Promise resolved with the updated document.
+   */
+  async replace (id, replaceData) {
+    return this._repository.replace(id, replaceData)
   }
 
   /**

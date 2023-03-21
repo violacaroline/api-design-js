@@ -95,8 +95,7 @@ export class LocationController {
   async create (req, res, next) {
     try {
       const newLocation = await this.#service.insert({
-        description: req.body.description,
-        done: req.body.done
+        city: req.body.city
       })
 
       const location = new URL(
@@ -108,7 +107,40 @@ export class LocationController {
         .status(201)
         .json(newLocation)
     } catch (error) {
+      const err = createError(error.name === 'ValidationError'
+        ? 400 // Bad format
+        : 500 // Something went really wrong
+      )
+      err.cause = error
+
       next(error)
+    }
+  }
+
+  /**
+   * Completely updates a specific location.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async update (req, res, next) {
+    try {
+      const { city } = req.body
+
+      await this.#service.replace(req.params.id, { city })
+
+      res
+        .status(204)
+        .end()
+    } catch (error) {
+      const err = createError(error.name === 'ValidationError'
+        ? 400 // Bad format
+        : 500 // Something went really wrong
+      )
+      err.cause = error
+
+      next(err)
     }
   }
 
