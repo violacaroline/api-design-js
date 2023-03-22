@@ -7,6 +7,7 @@
 
 import createError from 'http-errors'
 import { LocationService } from '../services/LocationService.js'
+import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
 /**
  * Encapsulates a controller.
@@ -74,7 +75,7 @@ export class LocationController {
     const halResponse = {
       _links: {
         self: {
-          href: locationUrl.href
+          href: HateoasLinkBuilder.getSelfLink()
         },
         get: {
           href: `${req.baseUrl}`,
@@ -121,17 +122,16 @@ export class LocationController {
     try {
       const locations = await this.#service.get()
 
+      // const locationBaseUrl = new URL(
+      //   `${req.protocol}://${req.get('host')}${req.baseUrl}`
+      // )
+
       const halResponse = {
         _links: {
           self: {
-            href: '/froot-boot/locations'
+            href: HateoasLinkBuilder.getSelfLink(req)
           },
-          create: {
-            href: '/froot-boot/locations',
-            method: 'POST',
-            title: 'Create Location',
-            description: 'Create a new location'
-          }
+          create: HateoasLinkBuilder.getCreateLink(req, 'location')
         },
         _embedded: {
           locations: locations.map(location => ({
@@ -139,24 +139,19 @@ export class LocationController {
             city: location.city,
             _links: {
               self: {
-                href: `/froot-boot/locations/${location.id}`
+                href: HateoasLinkBuilder.getResourceLink(req, location.id)
               },
               getById: {
-                href: `/froot-boot/locations/${location.id}`,
+                href: HateoasLinkBuilder.getResourceLink(req, location.id),
                 title: 'Get Location by ID',
                 description: 'Get a specific location by ID'
               },
-              update: {
-                href: `/froot-boot/locations/${location.id}`,
-                method: 'PUT',
-                title: 'Update Location',
-                description: `Update the location: ${location.city}`
-              },
-              delete: {
-                href: `/froot-boot/locations/${location.id}`,
-                method: 'DELETE',
-                title: 'Delete Location',
-                description: `Delete the location: ${location.city}`
+              update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
+              delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
+              members: {
+                href: HateoasLinkBuilder.getResourceLink(req, location.id) + '/members',
+                title: 'Get Members',
+                description: `Get members of the ${location.city} location`
               }
             }
           }))
