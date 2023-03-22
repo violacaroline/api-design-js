@@ -65,7 +65,49 @@ export class LocationController {
    * @param {Function} next - Express next middleware function.
    */
   async find (req, res, next) {
-    res.json(req.location)
+    const location = req.location
+
+    const locationUrl = new URL(
+      `${req.protocol}://${req.get('host')}${req.baseUrl}/${location._id}`
+    )
+
+    const halResponse = {
+      _links: {
+        self: {
+          href: locationUrl.href
+        },
+        get: {
+          href: `${req.baseUrl}`,
+          title: 'Get All Locations',
+          description: 'Get a list of all locations'
+        },
+        update: {
+          href: locationUrl.href,
+          method: 'PUT',
+          title: 'Update Location',
+          description: `Update the ${location.city} location`
+        },
+        delete: {
+          href: locationUrl.href,
+          method: 'DELETE',
+          title: 'Delete Location',
+          description: `Delete the ${location.city} location`
+        },
+        members: {
+          href: `${locationUrl.href}/members`,
+          title: 'Get Members',
+          description: `Get members of the ${location.city} location`
+        }
+      },
+      _embedded: {
+        location
+      }
+    }
+
+    res
+      .json(halResponse)
+      .status(200)
+    // res.json(req.location)
   }
 
   /**
@@ -79,7 +121,52 @@ export class LocationController {
     try {
       const locations = await this.#service.get()
 
-      res.json(locations)
+      const halResponse = {
+        _links: {
+          self: {
+            href: '/froot-boot/locations'
+          },
+          create: {
+            href: '/froot-boot/locations',
+            method: 'POST',
+            title: 'Create Location',
+            description: 'Create a new location'
+          }
+        },
+        _embedded: {
+          locations: locations.map(location => ({
+            id: location.id,
+            city: location.city,
+            _links: {
+              self: {
+                href: `/froot-boot/locations/${location.id}`
+              },
+              getById: {
+                href: `/froot-boot/locations/${location.id}`,
+                title: 'Get Location by ID',
+                description: 'Get a specific location by ID'
+              },
+              update: {
+                href: `/froot-boot/locations/${location.id}`,
+                method: 'PUT',
+                title: 'Update Location',
+                description: `Update the location: ${location.city}`
+              },
+              delete: {
+                href: `/froot-boot/locations/${location.id}`,
+                method: 'DELETE',
+                title: 'Delete Location',
+                description: `Delete the location: ${location.city}`
+              }
+            }
+          }))
+        }
+      }
+      res
+        .json(halResponse)
+        .status(200)
+
+      // res.json(locations)
     } catch (error) {
       next(error)
     }
@@ -102,10 +189,47 @@ export class LocationController {
         `${req.protocol}://${req.get('host')}${req.baseUrl}/${newLocation._id}`
       )
 
+      const halResponse = {
+        _links: {
+          self: {
+            href: location.href
+          },
+          get: {
+            href: `${req.baseUrl}`,
+            title: 'Get All Locations',
+            description: 'Get a list of all locations'
+          },
+          getById: {
+            href: `/froot-boot/locations/${newLocation._id}`,
+            title: 'Get Location by ID',
+            description: 'Get a specific location by ID'
+          },
+          update: {
+            href: location.href,
+            method: 'PUT',
+            title: 'Update Location',
+            description: `Update the ${newLocation.city} location`
+          },
+          delete: {
+            href: location.href,
+            method: 'DELETE',
+            title: 'Delete Location',
+            description: `Delete the ${newLocation.city} location`
+          }
+        },
+        _embedded: {
+          location: newLocation
+        }
+      }
+
       res
         .location(location.href)
         .status(201)
-        .json(newLocation)
+        .json(halResponse)
+      // res
+      //   .location(location.href)
+      //   .status(201)
+      //   .json(newLocation)
     } catch (error) {
       const err = createError(error.name === 'ValidationError'
         ? 400 // Bad format
@@ -130,9 +254,52 @@ export class LocationController {
 
       await this.#service.replace(req.params.id, { city })
 
+      const updatedLocation = await this.#service.getById(req.params.id)
+      const location = new URL(
+        `${req.protocol}://${req.get('host')}${req.baseUrl}/${updatedLocation._id}`
+      )
+
+      const halResponse = {
+        _links: {
+          self: {
+            href: location.href
+          },
+          get: {
+            href: `${req.baseUrl}`,
+            title: 'Get All Locations',
+            description: 'Get a list of all locations'
+          },
+          getById: {
+            href: `/froot-boot/locations/${updatedLocation._id}`,
+            title: 'Get Location by ID',
+            description: 'Get a specific location by ID'
+          },
+          create: {
+            href: `${req.baseUrl}`,
+            method: 'POST',
+            title: 'Create Location',
+            description: 'Create a new location'
+          },
+          delete: {
+            href: location.href,
+            method: 'DELETE',
+            title: 'Delete Location',
+            description: `Delete the ${updatedLocation.city} location`
+          }
+        },
+        _embedded: {
+          location: updatedLocation
+        }
+      }
+
       res
+        .location(location.href)
         .status(204)
+        .json(halResponse)
         .end()
+      // res
+      //   .status(204)
+      //   .end()
     } catch (error) {
       const err = createError(error.name === 'ValidationError'
         ? 400 // Bad format
@@ -153,11 +320,44 @@ export class LocationController {
    */
   async delete (req, res, next) {
     try {
-      await this.#service.delete(req.params.id)
+      const deletedLocation = req.params.id
+      await this.#service.delete(deletedLocation)
+
+      const halResponse = {
+        _links: {
+          self: {
+            href: `${req.baseUrl}/${deletedLocation}`,
+            method: 'DELETE',
+            title: 'Delete Location',
+            description: `Delete the location with id ${deletedLocation}`
+          },
+          get: {
+            href: `${req.baseUrl}`,
+            title: 'Get All Locations',
+            description: 'Get a list of all locations'
+          },
+          getById: {
+            href: `/froot-boot/locations/${deletedLocation}`,
+            title: 'Get Location by ID',
+            description: 'Get a specific location by ID'
+          },
+          create: {
+            href: `${req.baseUrl}`,
+            method: 'POST',
+            title: 'Create Location',
+            description: 'Create a new location'
+          }
+        }
+      }
 
       res
         .status(204)
+        .json(halResponse)
         .end()
+
+      // res
+      //   .status(204)
+      //   .end()
     } catch (error) {
       next(error)
     }

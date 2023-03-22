@@ -12,4 +12,4 @@ export const router = express.Router()
 
 router.get('/', (req, res) => res.json({ message: 'Hooray! Welcome to version 1 of this very simple Froot Boot RESTful API!' }))
 
-router.use('/locations', locationRouter)
+router.use('/froot-boot/locations', locationRouter)
