@@ -13,7 +13,7 @@ export const router = express.Router()
 
 router.get('/', (req, res) => res.json({ message: 'This will be version 1 of this very simple Froot Boot RESTful API!' }))
 
-router.use('/api/v1', v1Router)
+router.use('/api/v1/froot-boot', v1Router)
 
 // Catch 404 (ALWAYS keep this as the last route).
 router.use('*', (req, res, next) => next(createError(404)))

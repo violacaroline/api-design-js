@@ -8,11 +8,15 @@ export class HateoasLinkBuilder {
    * @param {*} req - Express request object.
    * @returns {object} - An object containing the link.
    */
-  static getSelfLink (req) {
+  static getBaseUrlLink (req) {
     const url = new URL(
         `${req.protocol}://${req.get('host')}${req.baseUrl}`
     )
-    return url
+    return {
+      href: url,
+      method: 'GET',
+      title: 'Get ALL resources'
+    }
   }
 
   /**
@@ -22,39 +26,64 @@ export class HateoasLinkBuilder {
    * @param {*} resourceId - The ID of the specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getResourceLink (req, resourceId) {
+  static getPlainResourceLink (req, resourceId) {
     const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}`)
-    return url
+    return {
+      href: url
+    }
   }
 
-  // /**
-  //  * Constructs link for collection.
-  //  *
-  //  * @param {*} req - Express request object.
-  //  * @param {*} baseUrl - The base URL, relative URI, absolute path. -----------> NOT NECESSARY?
-  //  * @returns {object} - An object containing the link.
-  //  */
-  // static getCollectionLink (req, baseUrl) {
-  //   const url = new URL(req.baseUrl, baseUrl)
-  //   return { href: url.toString() }
-  // }
+  /**
+   * Constructs link for specific resource.
+   *
+   * @param {*} req - Express request object.
+   * @param {*} resourceId - The ID of the specific resource.
+   * @param {*} resource - The specific resource.
+   * @returns {object} - An object containing the link.
+   */
+  static getResourceLink (req, resourceId, resource) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}`)
+    return {
+      href: url,
+      method: 'GET',
+      title: 'Get resource by ID',
+      description: `The requested resource ${resource}`
+    }
+  }
+
+  /**
+   * Constructs link for specific resource's next resource in the hierarchy.
+   *
+   * @param {*} req - Express request object.
+   * @param {*} resourceId - The ID of the specific resource.
+   * @param {*} resource - The specific resource.
+   * @param {*} nextResource - The specific resource's next resource.
+   * @returns {object} - An object containing the link.
+   */
+  static getNextResourceLink (req, resourceId, resource, nextResource) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}`)
+    return {
+      href: url + nextResource,
+      method: 'GET',
+      title: 'Get next resource',
+      description: `Get the next resource in the hierarchy of the requested resource ${resource}`
+    }
+  }
 
   /**
    * Constructs link for creating new resource.
    *
    * @param {*} req - Express request object.
-   * @param {*} resource - The specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getCreateLink (req, resource) {
+  static getCreateLink (req) {
     const url = new URL(
         `${req.protocol}://${req.get('host')}${req.baseUrl}`
     )
     return {
       href: url,
       method: 'POST',
-      title: `Create ${resource}`,
-      description: `Create a new ${resource}`
+      title: 'Create a new resource'
     }
   }
 

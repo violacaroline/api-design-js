@@ -18,7 +18,7 @@ export const router = express.Router()
 const resolveLocationController = (req) => req.app.get('container').resolve('LocationController')
 
 // Provide req.location to the route if :id is present in the route path.
-router.param('id', (req, res, next, id) => resolveLocationController(req).loadTask(req, res, next, id))
+router.param('id', (req, res, next, id) => resolveLocationController(req).loadLocation(req, res, next, id))
 
 // GET locations
 router.get('/', (req, res, next) => resolveLocationController(req).findAll(req, res, next))

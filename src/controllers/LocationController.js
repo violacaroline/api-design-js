@@ -68,37 +68,13 @@ export class LocationController {
   async find (req, res, next) {
     const location = req.location
 
-    const locationUrl = new URL(
-      `${req.protocol}://${req.get('host')}${req.baseUrl}/${location._id}`
-    )
-
     const halResponse = {
       _links: {
-        self: {
-          href: HateoasLinkBuilder.getSelfLink()
-        },
-        get: {
-          href: `${req.baseUrl}`,
-          title: 'Get All Locations',
-          description: 'Get a list of all locations'
-        },
-        update: {
-          href: locationUrl.href,
-          method: 'PUT',
-          title: 'Update Location',
-          description: `Update the ${location.city} location`
-        },
-        delete: {
-          href: locationUrl.href,
-          method: 'DELETE',
-          title: 'Delete Location',
-          description: `Delete the ${location.city} location`
-        },
-        members: {
-          href: `${locationUrl.href}/members`,
-          title: 'Get Members',
-          description: `Get members of the ${location.city} location`
-        }
+        self: HateoasLinkBuilder.getResourceLink(req, location._id, location.city),
+        get: HateoasLinkBuilder.getBaseUrlLink(req),
+        update: HateoasLinkBuilder.getUpdateLink(req, location._id, location.city),
+        delete: HateoasLinkBuilder.getDeleteLink(req, location._id, location.city),
+        members: HateoasLinkBuilder.getNextResourceLink(req, location._id, location.city, '/members') // NOT GOOD - HARDCODED
       },
       _embedded: {
         location
@@ -108,7 +84,7 @@ export class LocationController {
     res
       .json(halResponse)
       .status(200)
-    // res.json(req.location)
+      .end()
   }
 
   /**
@@ -122,15 +98,9 @@ export class LocationController {
     try {
       const locations = await this.#service.get()
 
-      // const locationBaseUrl = new URL(
-      //   `${req.protocol}://${req.get('host')}${req.baseUrl}`
-      // )
-
       const halResponse = {
         _links: {
-          self: {
-            href: HateoasLinkBuilder.getSelfLink(req)
-          },
+          self: HateoasLinkBuilder.getBaseUrlLink(req),
           create: HateoasLinkBuilder.getCreateLink(req, 'location')
         },
         _embedded: {
@@ -138,21 +108,11 @@ export class LocationController {
             id: location.id,
             city: location.city,
             _links: {
-              self: {
-                href: HateoasLinkBuilder.getResourceLink(req, location.id)
-              },
-              getById: {
-                href: HateoasLinkBuilder.getResourceLink(req, location.id),
-                title: 'Get Location by ID',
-                description: 'Get a specific location by ID'
-              },
+              self: HateoasLinkBuilder.getPlainResourceLink(req, location.id),
+              getById: HateoasLinkBuilder.getResourceLink(req, location.id, location.city),
               update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
               delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
-              members: {
-                href: HateoasLinkBuilder.getResourceLink(req, location.id) + '/members',
-                title: 'Get Members',
-                description: `Get members of the ${location.city} location`
-              }
+              members: HateoasLinkBuilder.getNextResourceLink(req, location.id, location.city, '/members')
             }
           }))
         }
@@ -160,8 +120,7 @@ export class LocationController {
       res
         .json(halResponse)
         .status(200)
-
-      // res.json(locations)
+        .end()
     } catch (error) {
       next(error)
     }
@@ -180,37 +139,13 @@ export class LocationController {
         city: req.body.city
       })
 
-      const location = new URL(
-        `${req.protocol}://${req.get('host')}${req.baseUrl}/${newLocation._id}`
-      )
-
       const halResponse = {
         _links: {
-          self: {
-            href: location.href
-          },
-          get: {
-            href: `${req.baseUrl}`,
-            title: 'Get All Locations',
-            description: 'Get a list of all locations'
-          },
-          getById: {
-            href: `/froot-boot/locations/${newLocation._id}`,
-            title: 'Get Location by ID',
-            description: 'Get a specific location by ID'
-          },
-          update: {
-            href: location.href,
-            method: 'PUT',
-            title: 'Update Location',
-            description: `Update the ${newLocation.city} location`
-          },
-          delete: {
-            href: location.href,
-            method: 'DELETE',
-            title: 'Delete Location',
-            description: `Delete the ${newLocation.city} location`
-          }
+          self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation._id),
+          get: HateoasLinkBuilder.getBaseUrlLink(req),
+          getById: HateoasLinkBuilder.getResourceLink(req, newLocation._id, newLocation.city),
+          update: HateoasLinkBuilder.getUpdateLink(req, newLocation._id, newLocation.city),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newLocation._id, newLocation.city)
         },
         _embedded: {
           location: newLocation
@@ -218,13 +153,9 @@ export class LocationController {
       }
 
       res
-        .location(location.href)
         .status(201)
         .json(halResponse)
-      // res
-      //   .location(location.href)
-      //   .status(201)
-      //   .json(newLocation)
+        .end()
     } catch (error) {
       const err = createError(error.name === 'ValidationError'
         ? 400 // Bad format
@@ -250,37 +181,14 @@ export class LocationController {
       await this.#service.replace(req.params.id, { city })
 
       const updatedLocation = await this.#service.getById(req.params.id)
-      const location = new URL(
-        `${req.protocol}://${req.get('host')}${req.baseUrl}/${updatedLocation._id}`
-      )
 
       const halResponse = {
         _links: {
-          self: {
-            href: location.href
-          },
-          get: {
-            href: `${req.baseUrl}`,
-            title: 'Get All Locations',
-            description: 'Get a list of all locations'
-          },
-          getById: {
-            href: `/froot-boot/locations/${updatedLocation._id}`,
-            title: 'Get Location by ID',
-            description: 'Get a specific location by ID'
-          },
-          create: {
-            href: `${req.baseUrl}`,
-            method: 'POST',
-            title: 'Create Location',
-            description: 'Create a new location'
-          },
-          delete: {
-            href: location.href,
-            method: 'DELETE',
-            title: 'Delete Location',
-            description: `Delete the ${updatedLocation.city} location`
-          }
+          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation._id),
+          get: HateoasLinkBuilder.getBaseUrlLink(req),
+          getById: HateoasLinkBuilder.getResourceLink(req, updatedLocation._id, updatedLocation.city),
+          create: HateoasLinkBuilder.getCreateLink(req),
+          delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation._id, updatedLocation.city)
         },
         _embedded: {
           location: updatedLocation
@@ -288,13 +196,9 @@ export class LocationController {
       }
 
       res
-        .location(location.href)
         .status(204)
         .json(halResponse)
         .end()
-      // res
-      //   .status(204)
-      //   .end()
     } catch (error) {
       const err = createError(error.name === 'ValidationError'
         ? 400 // Bad format
@@ -315,33 +219,18 @@ export class LocationController {
    */
   async delete (req, res, next) {
     try {
-      const deletedLocation = req.params.id
-      await this.#service.delete(deletedLocation)
+      const deletedLocationId = req.params.id
+      await this.#service.delete(deletedLocationId)
 
       const halResponse = {
         _links: {
-          self: {
-            href: `${req.baseUrl}/${deletedLocation}`,
-            method: 'DELETE',
-            title: 'Delete Location',
-            description: `Delete the location with id ${deletedLocation}`
-          },
-          get: {
-            href: `${req.baseUrl}`,
-            title: 'Get All Locations',
-            description: 'Get a list of all locations'
-          },
-          getById: {
-            href: `/froot-boot/locations/${deletedLocation}`,
-            title: 'Get Location by ID',
-            description: 'Get a specific location by ID'
-          },
-          create: {
-            href: `${req.baseUrl}`,
-            method: 'POST',
-            title: 'Create Location',
-            description: 'Create a new location'
-          }
+          self: HateoasLinkBuilder.getPlainResourceLink(req, deletedLocationId._id),
+          get: HateoasLinkBuilder.getBaseUrlLink(req),
+          getById: HateoasLinkBuilder.getResourceLink(req, deletedLocationId._id, deletedLocationId.city),
+          create: HateoasLinkBuilder.getCreateLink(req)
+        },
+        _embedded: {
+          location: deletedLocationId
         }
       }
 
@@ -349,10 +238,6 @@ export class LocationController {
         .status(204)
         .json(halResponse)
         .end()
-
-      // res
-      //   .status(204)
-      //   .end()
     } catch (error) {
       next(error)
     }
