@@ -7,9 +7,12 @@
 
 import express from 'express'
 import { router as locationRouter } from './locationRouter.js'
+import { router as memberRouter } from './memberRouter.js'
 
 export const router = express.Router()
 
 router.get('/', (req, res) => res.json({ message: 'Hooray! Welcome to version 1 of this very simple Froot Boot RESTful API!' }))
 
 router.use('/locations', locationRouter)
+
+router.use('/members', memberRouter)

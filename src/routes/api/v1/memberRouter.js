@@ -21,8 +21,8 @@ const resolveMemberController = (req) => req.app.get('container').resolve('Membe
 router.param('id', (req, res, next, id) => resolveMemberController(req).loadMember(req, res, next, id))
 
 // FIX THIS ---------------------
-// // Authenticate a member
-// router.post('/login', (req, res, next) => resolveMemberController(req).login(req, res, next))
+// Authenticate a member
+router.post('/login', (req, res, next) => resolveMemberController(req).login(req, res, next))
 
 // GET members
 router.get('/', (req, res, next) => resolveMemberController(req).findAll(req, res, next))
@@ -30,7 +30,7 @@ router.get('/', (req, res, next) => resolveMemberController(req).findAll(req, re
 // GET member/:id
 router.get('/:id', (req, res, next) => resolveMemberController(req).find(req, res, next))
 
-// POST member
+// POST - Create a member
 router.post('/', (req, res, next) => resolveMemberController(req).create(req, res, next))
 
 // PUT member/:id

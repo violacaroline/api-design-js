@@ -6,6 +6,7 @@
  */
 
 import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 
 // Create a schema.
 const schema = new mongoose.Schema({
@@ -23,6 +24,7 @@ const schema = new mongoose.Schema({
   },
   email: {
     type: String,
+    unique: true,
     required: true,
     trim: true,
     minlength: 2
@@ -37,6 +39,11 @@ const schema = new mongoose.Schema({
 
 schema.virtual('id').get(function () {
   return this._id.toHexString()
+})
+
+// Salts and hashes password before save.
+schema.pre('save', async function () {
+  this.password = await bcrypt.hash(this.password, 10)
 })
 
 const convertOptions = {
@@ -56,6 +63,27 @@ const convertOptions = {
 schema.set('timestamps', true)
 schema.set('toObject', convertOptions)
 schema.set('toJSON', convertOptions)
+
+/**
+ * Authenticates a member.
+ *
+ * @param {string} email - ...
+ * @param {string} password - ...
+ * @returns {Promise<MemberModel>} ...
+ */
+schema.statics.authenticate = async function (email, password) {
+  const member = await this.findOne({ email })
+
+  // If no member found or password is wrong, throw an error.
+  if (!(await bcrypt.compare(password, member?.password))) {
+    const error = new Error('Invalid credentials.')
+    error.statusCode = 401
+    throw error
+  }
+
+  // Member found and password correct, return the member.
+  return member
+}
 
 // Create a model using the schema.
 export const MemberModel = mongoose.model('Member', schema)

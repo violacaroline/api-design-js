@@ -76,10 +76,16 @@ export class MemberController {
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, member._id, member.name),
         delete: HateoasLinkBuilder.getDeleteLink(req, member._id, member.name),
-        members: HateoasLinkBuilder.getNextResourceLink(req, member._id, member.name, '/members') // NOT GOOD - HARDCODED
+        farms: HateoasLinkBuilder.getNextResourceLink(req, member._id, member.name, '/farms') // NOT GOOD - HARDCODED
       },
       _embedded: {
-        member
+        member: {
+          _links: {
+            self: HateoasLinkBuilder.getResourceLink(req, member._id, member.name)
+          },
+          id: member.id,
+          name: member.name
+        }
       }
     }
 
@@ -114,7 +120,7 @@ export class MemberController {
               getById: HateoasLinkBuilder.getResourceLink(req, member.id, member.name),
               update: HateoasLinkBuilder.getUpdateLink(req, member.id, member.name),
               delete: HateoasLinkBuilder.getDeleteLink(req, member.id, member.name),
-              farms: HateoasLinkBuilder.getNextResourceLink(req, member.id, member.name, '/members')
+              farms: HateoasLinkBuilder.getNextResourceLink(req, member.id, member.name, '/farms')
             }
           }))
         }
@@ -138,8 +144,13 @@ export class MemberController {
   async create (req, res, next) {
     try {
       const newMember = await this.#service.insert({
-        city: req.body.city
+        name: req.body.name,
+        phone: req.body.phone,
+        email: req.body.email,
+        password: req.body.password
       })
+
+      await newMember.save()
 
       const halResponse = {
         _links: {
@@ -150,7 +161,13 @@ export class MemberController {
           delete: HateoasLinkBuilder.getDeleteLink(req, newMember._id, newMember.city)
         },
         _embedded: {
-          member: newMember
+          member: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newMember._id)
+            },
+            id: newMember.id,
+            name: newMember.name
+          }
         }
       }
 
