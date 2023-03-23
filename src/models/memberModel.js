@@ -85,5 +85,17 @@ schema.statics.authenticate = async function (email, password) {
   return member
 }
 
+/**
+ * Authorizes a member. True if member has access token in Authorization header.
+ *
+ * @param {*} req - Express request object.
+ * @param {*} res - Express response object.
+ * @param {*} next - Next function call.
+ * @returns {boolean} - Authorize user true/false.
+ */
+schema.statics.authorize = async function (req, res, next) {
+  return req.header.authorization
+}
+
 // Create a model using the schema.
 export const MemberModel = mongoose.model('Member', schema)

@@ -81,7 +81,7 @@ export class MemberController {
       _embedded: {
         member: {
           _links: {
-            self: HateoasLinkBuilder.getResourceLink(req, member._id, member.name)
+            self: HateoasLinkBuilder.getPlainResourceLink(req, member._id)
           },
           id: member.id,
           name: member.name
@@ -156,9 +156,9 @@ export class MemberController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, newMember._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, newMember._id, newMember.city),
-          update: HateoasLinkBuilder.getUpdateLink(req, newMember._id, newMember.city),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newMember._id, newMember.city)
+          getById: HateoasLinkBuilder.getResourceLink(req, newMember._id, newMember.name),
+          update: HateoasLinkBuilder.getUpdateLink(req, newMember._id, newMember.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newMember._id, newMember.name)
         },
         _embedded: {
           member: {
@@ -176,13 +176,20 @@ export class MemberController {
         .json(halResponse)
         .end()
     } catch (error) {
-      const err = createError(error.name === 'ValidationError'
-        ? 400 // Bad format
-        : 500 // Something went really wrong
-      )
-      err.cause = error
+      if (error.name === 'MongoServerError' && error.code === 11000) {
+        // Duplicate email error
+        const error = new Error('Email address already in use')
+        error.status = 409
+        next(error)
+      } else {
+        const err = createError(error.name === 'ValidationError'
+          ? 400 // Bad format
+          : 500 // Something went really wrong
+        )
+        err.cause = error
 
-      next(error)
+        next(error)
+      }
     }
   }
 
