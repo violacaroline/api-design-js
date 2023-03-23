@@ -1,5 +1,5 @@
 /**
- * API version 1 routes.
+ * API version 1 location routes.
  *
  * @author Andrea Viola Caroline Åkesson
  * @version 1.0.0

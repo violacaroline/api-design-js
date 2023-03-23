@@ -1,5 +1,5 @@
 /**
- * Mongoose model Location.
+ * Mongoose model Member.
  *
  * @author Andrea Viola Caroline Åkesson
  * @version 1.0.0
@@ -9,11 +9,29 @@ import mongoose from 'mongoose'
 
 // Create a schema.
 const schema = new mongoose.Schema({
-  city: {
+  name: {
     type: String,
     required: true,
     trim: true,
-    minlength: 1
+    minlength: 2
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 2
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 2
+  },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 2
   }
 })
 
@@ -40,4 +58,4 @@ schema.set('toObject', convertOptions)
 schema.set('toJSON', convertOptions)
 
 // Create a model using the schema.
-export const LocationModel = mongoose.model('Location', schema)
+export const MemberModel = mongoose.model('Member', schema)
