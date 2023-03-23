@@ -68,6 +68,8 @@ export class LocationController {
   async find (req, res, next) {
     const location = req.location
 
+    /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
+
     const halResponse = {
       _links: {
         self: HateoasLinkBuilder.getResourceLink(req, location._id, location.city),

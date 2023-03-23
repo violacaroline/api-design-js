@@ -1,7 +1,7 @@
 /**
  * The starting point of the application.
  *
- * @author Mats Loock
+ * @author Andrea Viola Caroline Åkesson
  * @version 2.0.0
  */
 
@@ -29,6 +29,16 @@ try {
 
   // Parse requests of the content type application/json.
   app.use(express.json())
+
+  // Check if other accept header then application/json is specified.
+  app.use((req, res, next) => {
+    if ((req.headers.accept !== 'application/json') && !req.headers.accept) {
+      const error = new Error('Unsupported media type requested.')
+      error.status = 406
+      return next(error)
+    }
+    next()
+  })
 
   // Register routes.
   app.use('/', router)
