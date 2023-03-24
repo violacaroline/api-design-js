@@ -7,13 +7,17 @@
 
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import createError from 'http-errors'
+import validator from 'validator'
+
+const { isEmail } = validator
 
 // Create a schema.
 const schema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Name address is required.'],
     trim: true,
     minlength: 2
   },
@@ -25,16 +29,17 @@ const schema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
+    required: [true, 'Phone address is required.'],
     trim: true,
     minlength: 2
   },
   email: {
     type: String,
     unique: true,
-    required: true,
+    required: [true, 'Email address is required.'],
     trim: true,
-    minlength: 2
+    minlength: 2,
+    validate: [isEmail, 'Please provide a valid email address.']
   },
   password: {
     type: String,
@@ -99,19 +104,38 @@ schema.statics.authenticate = async function (email, password) {
 }
 
 /**
- * Authorizes a member. True if member has access token in Authorization header.
+ * Authenticates jwts.
  *
- * @param {*} req - Express request object.
- * @param {*} res - Express response object.
- * @param {*} next - Next function call.
- * @returns {*} - Authorized member and call to next() (or not).
+ * If authentication is successful, `req.member`is populated and the
+ * request is authorized to continue.
+ * If authentication fails, an unauthorized response will be sent.
+ *
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
  */
-schema.statics.authorize = async function (req, res, next) {
-  const authorized = req.header.authorization
-  if (authorized) {
+schema.statics.authenticateJWT = (req, res, next) => {
+  try {
+    const [authenticationScheme, token] = req.headers.authorization?.split(' ')
+
+    if (authenticationScheme !== 'Bearer') {
+      throw new Error('Invalid authentication scheme.')
+    }
+
+    const publicKey = Buffer.from(process.env.ACCESS_TOKEN_SECRET_PUBLIC, 'base64')
+
+    const payload = jwt.verify(token, publicKey)
+    req.member = {
+      id: payload.sub,
+      name: payload.name,
+      email: payload.email
+    }
+
     next()
-  } else {
-    return next(createError(401, 'Sorry, you are unauthorized.'))
+  } catch (err) {
+    const error = createError(401)
+    error.cause = err
+    next(error)
   }
 }
 

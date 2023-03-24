@@ -6,7 +6,7 @@
  */
 
 import createError from 'http-errors'
-// import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { MemberModel } from '../models/MemberModel.js'
 import { MemberService } from '../services/MemberService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
@@ -74,25 +74,26 @@ export class MemberController {
 
       const member = await MemberModel.authenticate(req.body.email, req.body.password)
 
-      // const payload = {
-      //   sub: member.id,
-      //   name: member.name,
-      //   location: member.location,
-      //   phone: member.phone,
-      //   email: member.email
-      // }
+      const payload = {
+        sub: member.id,
+        name: member.name,
+        location: member.location,
+        phone: member.phone,
+        email: member.email
+      }
 
+      const privateKey = Buffer.from(process.env.ACCESS_TOKEN_SECRET_PRIVATE, 'base64')
       // Create the access token with the shorter lifespan.
-      // const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      //   algorithm: 'RS256',
-      //   expiresIn: process.env.ACCESS_TOKEN_LIFE
-      // })
+      const accessToken = jwt.sign(payload, privateKey, {
+        algorithm: 'RS256',
+        expiresIn: 60 * 1000 * 20
+      })
 
       res
         .json({
           name: member.name,
           user_id: member.id,
-          // access_token: accessToken,
+          access_token: accessToken,
           message: 'You are logged in'
         })
     } catch (error) {
