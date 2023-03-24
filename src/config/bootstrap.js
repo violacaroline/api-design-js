@@ -19,11 +19,17 @@ import { MemberRepository } from '../repositories/MemberRepository.js'
 import { MemberService } from '../services/MemberService.js'
 import { MemberController } from '../controllers/MemberController.js'
 
+// Farm RELATED FILES
+import { FarmModel } from '../models/FarmModel.js'
+import { FarmRepository } from '../repositories/FarmRepository.js'
+import { FarmService } from '../services/FarmService.js'
+import { FarmController } from '../controllers/FarmController.js'
+
 const iocContainer = new IoCContainer()
 
 iocContainer.register('ConnectionString', process.env.DB_CONNECTION_STRING)
 
-// REGISTER LOCATION RELATED ENTITIES
+/* ====== REGISTER LOCATION RELATED ENTITIES ====== */
 iocContainer.register('LocationModelType', LocationModel, { type: true })
 
 iocContainer.register('LocationRepositorySingleton', LocationRepository, {
@@ -46,7 +52,7 @@ iocContainer.register('LocationController', LocationController, {
   ]
 })
 
-// REGISTER MEMBER RELATED ENTITIES
+/* ====== REGISTER MEMBER RELATED ENTITIES ====== */
 iocContainer.register('MemberModelType', MemberModel, { type: true })
 
 iocContainer.register('MemberRepositorySingleton', MemberRepository, {
@@ -66,6 +72,29 @@ iocContainer.register('MemberServiceSingleton', MemberService, {
 iocContainer.register('MemberController', MemberController, {
   dependencies: [
     'MemberServiceSingleton'
+  ]
+})
+
+/* ====== REGISTER FARM RELATED ENTITIES ====== */
+iocContainer.register('FarmModelType', FarmModel, { type: true })
+
+iocContainer.register('FarmRepositorySingleton', FarmRepository, {
+  dependencies: [
+    'FarmModelType'
+  ],
+  singleton: true
+})
+
+iocContainer.register('FarmServiceSingleton', FarmService, {
+  dependencies: [
+    'FarmRepositorySingleton'
+  ],
+  singleton: true
+})
+
+iocContainer.register('FarmController', FarmController, {
+  dependencies: [
+    'FarmServiceSingleton'
   ]
 })
 

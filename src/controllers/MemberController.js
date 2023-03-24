@@ -98,7 +98,6 @@ export class MemberController {
         })
     } catch (error) {
       // Authentication failed.
-      console.log('It fails in controller')
       const err = createError(401)
       err.cause = error
 

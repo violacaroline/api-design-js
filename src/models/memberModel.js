@@ -17,7 +17,7 @@ const { isEmail } = validator
 const schema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name address is required.'],
+    required: [true, 'Name is required.'],
     trim: true,
     minlength: 2
   },
@@ -29,7 +29,7 @@ const schema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Phone address is required.'],
+    required: [true, 'Phone is required.'],
     trim: true,
     minlength: 2
   },
@@ -92,8 +92,6 @@ schema.statics.authenticate = async function (email, password) {
 
   // If no member found or password is wrong, throw an error.
   if (!(await bcrypt.compare(password, member?.password))) {
-    console.log('It fails in model')
-
     const error = new Error('Invalid credentials.')
     error.statusCode = 401
     throw error

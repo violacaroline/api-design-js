@@ -1,5 +1,5 @@
 /**
- * Mongoose model Location.
+ * Mongoose model Farm.
  *
  * @author Andrea Viola Caroline Åkesson
  * @version 1.0.0
@@ -9,9 +9,15 @@ import mongoose from 'mongoose'
 
 // Create a schema.
 const schema = new mongoose.Schema({
-  city: {
+  name: {
     type: String,
-    required: [true, 'City is required.'],
+    required: [true, 'Name is required.'],
+    trim: true,
+    minlength: 1
+  },
+  owner: {
+    type: String,
+    required: [true, 'Owner is required.'],
     trim: true,
     minlength: 1
   }
@@ -40,4 +46,4 @@ schema.set('toObject', convertOptions)
 schema.set('toJSON', convertOptions)
 
 // Create a model using the schema.
-export const LocationModel = mongoose.model('Location', schema)
+export const FarmModel = mongoose.model('Farm', schema)
