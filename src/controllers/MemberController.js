@@ -6,6 +6,8 @@
  */
 
 import createError from 'http-errors'
+// import jwt from 'jsonwebtoken'
+import { MemberModel } from '../models/MemberModel.js'
 import { MemberService } from '../services/MemberService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
@@ -55,6 +57,51 @@ export class MemberController {
       next()
     } catch (error) {
       next(error)
+    }
+  }
+
+  /**
+   * Authenticates a user.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async login (req, res, next) {
+    try {
+      console.log('Email: ', req.body.email)
+      console.log('Password: ', req.body.password)
+
+      const member = await MemberModel.authenticate(req.body.email, req.body.password)
+
+      // const payload = {
+      //   sub: member.id,
+      //   name: member.name,
+      //   location: member.location,
+      //   phone: member.phone,
+      //   email: member.email
+      // }
+
+      // Create the access token with the shorter lifespan.
+      // const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      //   algorithm: 'RS256',
+      //   expiresIn: process.env.ACCESS_TOKEN_LIFE
+      // })
+
+      res
+        .json({
+          name: member.name,
+          user_id: member.id,
+          // access_token: accessToken,
+          message: 'You are logged in'
+        })
+    } catch (error) {
+      // Authentication failed.
+      console.log('It fails in controller')
+      const err = createError(401)
+      err.cause = error
+
+      next(err)
     }
   }
 
@@ -145,6 +192,7 @@ export class MemberController {
     try {
       const newMember = await this.#service.insert({
         name: req.body.name,
+        location: req.body.location,
         phone: req.body.phone,
         email: req.body.email,
         password: req.body.password

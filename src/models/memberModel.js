@@ -7,10 +7,17 @@
 
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
+import createError from 'http-errors'
 
 // Create a schema.
 const schema = new mongoose.Schema({
   name: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 2
+  },
+  location: {
     type: String,
     required: true,
     trim: true,
@@ -33,7 +40,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 2
+    minlength: [8, 'The password should be 8 characters minimum']
   }
 })
 
@@ -43,6 +50,10 @@ schema.virtual('id').get(function () {
 
 // Salts and hashes password before save.
 schema.pre('save', async function () {
+  if (!this.isModified('password')) {
+    return
+  }
+
   this.password = await bcrypt.hash(this.password, 10)
 })
 
@@ -76,6 +87,8 @@ schema.statics.authenticate = async function (email, password) {
 
   // If no member found or password is wrong, throw an error.
   if (!(await bcrypt.compare(password, member?.password))) {
+    console.log('It fails in model')
+
     const error = new Error('Invalid credentials.')
     error.statusCode = 401
     throw error
@@ -91,10 +104,15 @@ schema.statics.authenticate = async function (email, password) {
  * @param {*} req - Express request object.
  * @param {*} res - Express response object.
  * @param {*} next - Next function call.
- * @returns {boolean} - Authorize user true/false.
+ * @returns {*} - Authorized member and call to next() (or not).
  */
 schema.statics.authorize = async function (req, res, next) {
-  return req.header.authorization
+  const authorized = req.header.authorization
+  if (authorized) {
+    next()
+  } else {
+    return next(createError(401, 'Sorry, you are unauthorized.'))
+  }
 }
 
 // Create a model using the schema.

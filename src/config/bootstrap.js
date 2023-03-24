@@ -23,7 +23,7 @@ const iocContainer = new IoCContainer()
 
 iocContainer.register('ConnectionString', process.env.DB_CONNECTION_STRING)
 
-// REGISTER LOCATION RELATED FILES
+// REGISTER LOCATION RELATED ENTITIES
 iocContainer.register('LocationModelType', LocationModel, { type: true })
 
 iocContainer.register('LocationRepositorySingleton', LocationRepository, {
@@ -46,7 +46,7 @@ iocContainer.register('LocationController', LocationController, {
   ]
 })
 
-// REGISTER MEMBER RELATED FILES
+// REGISTER MEMBER RELATED ENTITIES
 iocContainer.register('MemberModelType', MemberModel, { type: true })
 
 iocContainer.register('MemberRepositorySingleton', MemberRepository, {

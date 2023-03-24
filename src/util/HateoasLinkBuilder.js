@@ -34,7 +34,7 @@ export class HateoasLinkBuilder {
   }
 
   /**
-   * Constructs link for specific resource.
+   * Constructs link for specific resource with title and description.
    *
    * @param {*} req - Express request object.
    * @param {*} resourceId - The ID of the specific resource.
