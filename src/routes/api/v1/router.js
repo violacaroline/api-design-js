@@ -9,6 +9,7 @@ import express from 'express'
 import { router as locationRouter } from './locationRouter.js'
 import { router as memberRouter } from './memberRouter.js'
 import { router as farmRouter } from './farmRouter.js'
+import { router as productRouter } from './productRouter.js'
 
 export const router = express.Router()
 
@@ -19,3 +20,5 @@ router.use('/locations', locationRouter)
 router.use('/members', memberRouter)
 
 router.use('/farms', farmRouter)
+
+router.use('/products', productRouter)

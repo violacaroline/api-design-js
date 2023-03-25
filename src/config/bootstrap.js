@@ -19,11 +19,17 @@ import { MemberRepository } from '../repositories/MemberRepository.js'
 import { MemberService } from '../services/MemberService.js'
 import { MemberController } from '../controllers/MemberController.js'
 
-// Farm RELATED FILES
+// FARM RELATED FILES
 import { FarmModel } from '../models/FarmModel.js'
 import { FarmRepository } from '../repositories/FarmRepository.js'
 import { FarmService } from '../services/FarmService.js'
 import { FarmController } from '../controllers/FarmController.js'
+
+// PRODUCT RELATED FILES
+import { ProductModel } from '../models/ProductModel.js'
+import { ProductRepository } from '../repositories/ProductRepository.js'
+import { ProductService } from '../services/ProductService.js'
+import { ProductController } from '../controllers/ProductController.js'
 
 const iocContainer = new IoCContainer()
 
@@ -95,6 +101,29 @@ iocContainer.register('FarmServiceSingleton', FarmService, {
 iocContainer.register('FarmController', FarmController, {
   dependencies: [
     'FarmServiceSingleton'
+  ]
+})
+
+/* ====== REGISTER PRODUCT RELATED ENTITIES ====== */
+iocContainer.register('ProductModelType', ProductModel, { type: true })
+
+iocContainer.register('ProductRepositorySingleton', ProductRepository, {
+  dependencies: [
+    'ProductModelType'
+  ],
+  singleton: true
+})
+
+iocContainer.register('ProductServiceSingleton', ProductService, {
+  dependencies: [
+    'ProductRepositorySingleton'
+  ],
+  singleton: true
+})
+
+iocContainer.register('ProductController', ProductController, {
+  dependencies: [
+    'ProductServiceSingleton'
   ]
 })
 

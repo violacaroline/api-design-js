@@ -9,7 +9,7 @@ import { MongooseRepositoryBase } from './MongooseRepositoryBase.js'
 import { LocationModel } from '../models/LocationModel.js'
 
 /**
- * Encapsulates a location repository.
+ * Encapsulates a LocationRepository.
  */
 export class LocationRepository extends MongooseRepositoryBase {
   /**
