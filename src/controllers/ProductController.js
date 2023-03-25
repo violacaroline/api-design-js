@@ -75,11 +75,16 @@ export class ProductController {
         self: HateoasLinkBuilder.getResourceLink(req, product._id, product.name),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, product._id, product.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, product._id, product.name),
-        members: HateoasLinkBuilder.getNextResourceLink(req, product._id, product.name, '/members') // NOT GOOD - HARDCODED
+        delete: HateoasLinkBuilder.getDeleteLink(req, product._id, product.name)
       },
       _embedded: {
-        product
+        product: {
+          _links: {
+            self: HateoasLinkBuilder.getPlainResourceLink(req, product._id)
+          },
+          id: product.id,
+          name: product.name
+        }
       }
     }
 
@@ -113,8 +118,7 @@ export class ProductController {
               self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
               getById: HateoasLinkBuilder.getResourceLink(req, product.id, product.name),
               update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
-              delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name),
-              members: HateoasLinkBuilder.getNextResourceLink(req, product.id, product.name, '/members')
+              delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
             }
           }))
         }
@@ -139,7 +143,7 @@ export class ProductController {
     try {
       const newProduct = await this.#service.insert({
         name: req.body.name,
-        farm: req.body.farm,
+        producer: req.body.producer,
         price: req.body.price,
         soldout: req.body.soldout
       })
@@ -153,7 +157,13 @@ export class ProductController {
           delete: HateoasLinkBuilder.getDeleteLink(req, newProduct._id, newProduct.name)
         },
         _embedded: {
-          product: newProduct
+          product: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id)
+            },
+            id: newProduct.id,
+            name: newProduct.name
+          }
         }
       }
 
@@ -196,7 +206,13 @@ export class ProductController {
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedProduct._id, updatedProduct.name)
         },
         _embedded: {
-          product: updatedProduct
+          product: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id)
+            },
+            id: updatedProduct.id,
+            name: updatedProduct.name
+          }
         }
       }
 

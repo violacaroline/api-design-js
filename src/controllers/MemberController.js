@@ -265,7 +265,11 @@ export class MemberController {
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedMember._id, updatedMember.name)
         },
         _embedded: {
-          member: updatedMember
+          _links: {
+            self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember._id)
+          },
+          id: updatedMember.id,
+          name: updatedMember.name
         }
       }
 

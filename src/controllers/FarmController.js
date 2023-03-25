@@ -79,7 +79,13 @@ export class FarmController {
         products: HateoasLinkBuilder.getNextResourceLink(req, farm._id, farm.name, '/products') // NOT GOOD - HARDCODED
       },
       _embedded: {
-        farm
+        farm: {
+          _links: {
+            self: HateoasLinkBuilder.getPlainResourceLink(req, farm._id)
+          },
+          id: farm.id,
+          name: farm.name
+        }
       }
     }
 
@@ -139,7 +145,7 @@ export class FarmController {
     try {
       const newFarm = await this.#service.insert({
         name: req.body.name,
-        owner: req.body.owner
+        member: req.body.member
       })
 
       const halResponse = {
@@ -151,7 +157,13 @@ export class FarmController {
           delete: HateoasLinkBuilder.getDeleteLink(req, newFarm._id, newFarm.name)
         },
         _embedded: {
-          farm: newFarm
+          farm: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm._id)
+            },
+            id: newFarm.id,
+            name: newFarm.name
+          }
         }
       }
 
@@ -194,7 +206,13 @@ export class FarmController {
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedFarm._id, updatedFarm.name)
         },
         _embedded: {
-          farm: updatedFarm
+          farm: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm._id)
+            },
+            id: updatedFarm.id,
+            name: updatedFarm.name
+          }
         }
       }
 

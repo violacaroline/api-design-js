@@ -15,9 +15,9 @@ const schema = new mongoose.Schema({
     trim: true,
     minlength: 1
   },
-  farm: {
+  producer: {
     type: String,
-    required: [true, 'Farm is required.'],
+    required: [true, 'The producing farm is required.'],
     trim: true,
     minlength: 1
   },

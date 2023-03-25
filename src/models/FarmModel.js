@@ -15,9 +15,9 @@ const schema = new mongoose.Schema({
     trim: true,
     minlength: 1
   },
-  owner: {
+  member: {
     type: String,
-    required: [true, 'Owner is required.'],
+    required: [true, 'Owning member is required.'],
     trim: true,
     minlength: 1
   }
