@@ -3,7 +3,7 @@
  */
 export class HateoasLinkBuilder {
   /**
-   * Constructs link for self.
+   * Constructs a link for ALL resources.
    *
    * @param {*} req - Express request object.
    * @returns {object} - An object containing the link.
@@ -41,7 +41,7 @@ export class HateoasLinkBuilder {
    * @param {*} resource - The specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getResourceLink (req, resourceId, resource) {
+  static getResourceByIdLink (req, resourceId, resource) {
     const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}`)
     return {
       href: url,
@@ -52,25 +52,45 @@ export class HateoasLinkBuilder {
   }
 
   /**
-   * Constructs link for specific resource's next resource in the hierarchy.
+   * Constructs link for specific resource's nested resource in the hierarchy.
    *
    * @param {*} req - Express request object.
    * @param {*} resourceId - The ID of the specific resource.
-   * @param {*} resource - The specific resource.
-   * @param {*} nextResource - The specific resource's next resource.
+   * @param {*} nestedResource - The specific resource's nested resource.
    * @returns {object} - An object containing the link.
    */
-  static getNextResourceLink (req, resourceId, resource, nextResource) {
-    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}`)
+  static getNestedResourceLink (req, resourceId, nestedResource) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}/${nestedResource}`)
     return {
-      href: url + nextResource,
+      href: url,
       method: 'GET',
-      title: 'Get next resource',
-      description: `Get the next resource in the hierarchy of the requested resource ${resource}`
+      title: 'Get nested resource',
+      description: 'Gets ALL instances of the last nested resource in the url'
     }
   }
 
   /**
+   * Constructs link for specific resource's nested resource in the hierarchy.
+   *
+   * @param {*} req - Express request object.
+   * @param {*} resourceId - The ID of the specific resource.
+   * @param {*} nestedResource - The specific resource's nested resource.
+   * @param {*} nestedResourceId - The specific resource's nested resource ID.
+   * @returns {object} - An object containing the link.
+   */
+  static getNestedResourceByIdLink (req, resourceId, nestedResource, nestedResourceId) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceId}/${nestedResource}/${nestedResourceId}`)
+    return {
+      href: url,
+      method: 'GET',
+      title: 'An instance of the nested resource',
+      description: 'Gets an instance of the last nested resource in the url, by its ID'
+    }
+  }
+
+  /**
+   * THIS PROBABLY NEEDS BE BUILT LIKE UPDATE/DELETE IF CHANGING POST ROUTES
+   *
    * Constructs link for creating new resource.
    *
    * @param {*} req - Express request object.

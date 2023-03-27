@@ -3,6 +3,7 @@
  */
 
 import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 
 /**
  * Encapsulates a Mongoose repository base.
@@ -120,8 +121,6 @@ export class MongooseRepositoryBase {
   }
 
   /**
-   * MIGHT NOT NEED???
-   *
    * Updates a document according to the new data.
    *
    * @param {string} id - Value of the documents id to update.
@@ -152,10 +151,22 @@ export class MongooseRepositoryBase {
    * @returns {Promise<object>} Promise resolved with the updated document.
    */
   async replace (id, replaceData, options) {
-    this.#ensureValidPropertyNames(replaceData)
+    const document = await this.#model.findById(id).exec()
+    if (!document) {
+      throw new Error(`Document with id ${id} not found`)
+    }
+
+    const updatedDocument = {
+      ...document.toObject(),
+      ...replaceData
+    }
+
+    if (replaceData.password) {
+      updatedDocument.password = await bcrypt.hash(replaceData.password, 10)
+    }
 
     return this.#model
-      .findOneAndReplace({ _id: id }, replaceData, {
+      .findOneAndReplace({ _id: id }, updatedDocument, {
         ...options,
         returnDocument: 'after',
         runValidators: true

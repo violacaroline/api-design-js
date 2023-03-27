@@ -7,6 +7,7 @@
 
 import createError from 'http-errors'
 import { FarmService } from '../services/FarmService.js'
+import { ProductService } from '../services/ProductService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
 /**
@@ -21,12 +22,21 @@ export class FarmController {
   #service
 
   /**
+   * The productService.
+   *
+   * @type {ProductService} - The ProductService instance.
+   */
+  #productService
+
+  /**
    * Initializes a new instance.
    *
    * @param {FarmService} service - A service instantiated from a class with the same capabilities as FarmService.
+   * @param {ProductService} productService - A service instantiated from a class with the same capabilities as ProductService.
    */
-  constructor (service = new FarmService()) {
+  constructor (service = new FarmService(), productService = new ProductService()) {
     this.#service = service
+    this.#productService = productService
   }
 
   /**
@@ -72,11 +82,11 @@ export class FarmController {
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceLink(req, farm._id, farm.name),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, farm._id, farm.name),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, farm._id, farm.name),
         delete: HateoasLinkBuilder.getDeleteLink(req, farm._id, farm.name),
-        products: HateoasLinkBuilder.getNextResourceLink(req, farm._id, farm.name, '/products') // NOT GOOD - HARDCODED
+        products: HateoasLinkBuilder.getNestedResourceLink(req, farm._id, farm.name, 'products') // NOT GOOD - HARDCODED
       },
       _embedded: {
         farm: {
@@ -84,7 +94,8 @@ export class FarmController {
             self: HateoasLinkBuilder.getPlainResourceLink(req, farm._id)
           },
           id: farm.id,
-          name: farm.name
+          name: farm.name,
+          member: farm.member
         }
       }
     }
@@ -117,10 +128,56 @@ export class FarmController {
             name: farm.name,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, farm.id),
-              getById: HateoasLinkBuilder.getResourceLink(req, farm.id, farm.name),
+              getById: HateoasLinkBuilder.getResourceByIdLink(req, farm.id, farm.name),
               update: HateoasLinkBuilder.getUpdateLink(req, farm.id, farm.name),
               delete: HateoasLinkBuilder.getDeleteLink(req, farm.id, farm.name),
-              products: HateoasLinkBuilder.getNextResourceLink(req, farm.id, farm.name, '/products')
+              products: HateoasLinkBuilder.getNestedResourceLink(req, farm.id, farm.name, 'products')
+            }
+          }))
+        }
+      }
+      res
+        .json(halResponse)
+        .status(200)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Sends a JSON response containing a specific farms's products.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async findProductsByFarm (req, res, next) {
+    try {
+      console.log('The req.params: ', req.params)
+      const farm = {
+        location: req.params.id
+      }
+      const farmId = req.params.id
+
+      const productsOfFarm = await this.#productService.getNestedResourceById(farm)
+
+      console.log('Members of location: ', productsOfFarm)
+
+      const halResponse = {
+        _links: {
+          self: HateoasLinkBuilder.getNestedResourceLink(req, farmId, 'products'),
+          create: HateoasLinkBuilder.getCreateLink(req, 'products')
+        },
+        _embedded: {
+          products: productsOfFarm.map(product => ({
+            id: product.id,
+            name: product.name,
+            producer: product.producer,
+            price: product.price,
+            soldout: product.soldout,
+            _links: {
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, farmId, 'products', product.id)
             }
           }))
         }
@@ -152,7 +209,7 @@ export class FarmController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, newFarm._id, newFarm.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newFarm._id, newFarm.name),
           update: HateoasLinkBuilder.getUpdateLink(req, newFarm._id, newFarm.name),
           delete: HateoasLinkBuilder.getDeleteLink(req, newFarm._id, newFarm.name)
         },
@@ -162,7 +219,8 @@ export class FarmController {
               self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm._id)
             },
             id: newFarm.id,
-            name: newFarm.name
+            name: newFarm.name,
+            member: newFarm.member
           }
         }
       }
@@ -191,9 +249,9 @@ export class FarmController {
    */
   async update (req, res, next) {
     try {
-      const { name, owner } = req.body
+      const { name, member } = req.body
 
-      await this.#service.replace(req.params.id, { name, owner })
+      await this.#service.replace(req.params.id, { name, member })
 
       const updatedFarm = await this.#service.getById(req.params.id)
 
@@ -201,7 +259,7 @@ export class FarmController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, updatedFarm._id, updatedFarm.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedFarm._id, updatedFarm.name),
           create: HateoasLinkBuilder.getCreateLink(req),
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedFarm._id, updatedFarm.name)
         },
@@ -211,13 +269,14 @@ export class FarmController {
               self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm._id)
             },
             id: updatedFarm.id,
-            name: updatedFarm.name
+            name: updatedFarm.name,
+            member: updatedFarm.member
           }
         }
       }
 
       res
-        .status(204)
+        .status(200)
         .json(halResponse)
         .end()
     } catch (error) {
@@ -247,7 +306,7 @@ export class FarmController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, deletedFarmId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, deletedFarmId._id, deletedFarmId.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedFarmId._id, deletedFarmId.name),
           create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {

@@ -72,7 +72,7 @@ export class ProductController {
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceLink(req, product._id, product.name),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, product._id, product.name),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, product._id, product.name),
         delete: HateoasLinkBuilder.getDeleteLink(req, product._id, product.name)
@@ -83,7 +83,10 @@ export class ProductController {
             self: HateoasLinkBuilder.getPlainResourceLink(req, product._id)
           },
           id: product.id,
-          name: product.name
+          name: product.name,
+          producer: product.producer,
+          price: product.price,
+          soldout: product.soldout
         }
       }
     }
@@ -116,7 +119,7 @@ export class ProductController {
             name: product.name,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
-              getById: HateoasLinkBuilder.getResourceLink(req, product.id, product.name),
+              getById: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
               update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
               delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
             }
@@ -152,7 +155,7 @@ export class ProductController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, newProduct._id, newProduct.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newProduct._id, newProduct.name),
           update: HateoasLinkBuilder.getUpdateLink(req, newProduct._id, newProduct.name),
           delete: HateoasLinkBuilder.getDeleteLink(req, newProduct._id, newProduct.name)
         },
@@ -162,7 +165,10 @@ export class ProductController {
               self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id)
             },
             id: newProduct.id,
-            name: newProduct.name
+            name: newProduct.name,
+            producer: newProduct.producer,
+            price: newProduct.price,
+            soldout: newProduct.soldout
           }
         }
       }
@@ -191,9 +197,9 @@ export class ProductController {
    */
   async update (req, res, next) {
     try {
-      const { name, price, soldout } = req.body
+      const { name, producer, price, soldout } = req.body
 
-      await this.#service.replace(req.params.id, { name, price, soldout })
+      await this.#service.replace(req.params.id, { name, producer, price, soldout })
 
       const updatedProduct = await this.#service.getById(req.params.id)
 
@@ -201,7 +207,7 @@ export class ProductController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, updatedProduct._id, updatedProduct.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedProduct._id, updatedProduct.name),
           create: HateoasLinkBuilder.getCreateLink(req),
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedProduct._id, updatedProduct.name)
         },
@@ -211,13 +217,16 @@ export class ProductController {
               self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id)
             },
             id: updatedProduct.id,
-            name: updatedProduct.name
+            name: updatedProduct.name,
+            producer: updatedProduct.producer,
+            price: updatedProduct.price,
+            soldout: updatedProduct.soldout
           }
         }
       }
 
       res
-        .status(204)
+        .status(200)
         .json(halResponse)
         .end()
     } catch (error) {
@@ -247,7 +256,7 @@ export class ProductController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, deletedProductId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, deletedProductId._id, deletedProductId.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedProductId._id, deletedProductId.name),
           create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {

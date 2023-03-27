@@ -30,6 +30,16 @@ export class MongooseServiceBase {
   }
 
   /**
+   * Gets all documents with a certain ID - i.e parent.
+   *
+   * @param {object} nestedResourceId - ...
+   * @returns {Promise<object>} Promise resolved with all documents as plain JavaScript objects.
+   */
+  async getNestedResourceById (nestedResourceId) {
+    return this._repository.get(nestedResourceId)
+  }
+
+  /**
    * Gets a document by ID.
    *
    * @param {string} id - The value of the id for the document to get.

@@ -26,6 +26,9 @@ router.get('/', (req, res, next) => resolveLocationController(req).findAll(req, 
 // GET location/:id
 router.get('/:id', (req, res, next) => resolveLocationController(req).find(req, res, next))
 
+// GET location/:id/members
+router.get('/:id/members', (req, res, next) => resolveLocationController(req).findMembersByLocation(req, res, next))
+
 // POST location
 router.post('/', (req, res, next) => resolveLocationController(req).create(req, res, next))
 

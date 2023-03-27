@@ -7,6 +7,7 @@
 
 import createError from 'http-errors'
 import { LocationService } from '../services/LocationService.js'
+import { MemberService } from '../services/MemberService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
 /**
@@ -21,12 +22,21 @@ export class LocationController {
   #service
 
   /**
+   * The memberService.
+   *
+   * @type {MemberService} - The LocationService instance.
+   */
+  #memberService
+
+  /**
    * Initializes a new instance.
    *
    * @param {LocationService} service - A service instantiated from a class with the same capabilities as LocationService.
+   * @param {MemberService} memberService - A service instantiated from a class with the same capabilities as LocationService.
    */
-  constructor (service = new LocationService()) {
+  constructor (service = new LocationService(), memberService = new MemberService()) {
     this.#service = service
+    this.#memberService = memberService
   }
 
   /**
@@ -72,11 +82,11 @@ export class LocationController {
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceLink(req, location._id, location.city),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, location._id, location.city),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, location._id, location.city),
         delete: HateoasLinkBuilder.getDeleteLink(req, location._id, location.city),
-        members: HateoasLinkBuilder.getNextResourceLink(req, location._id, location.city, '/members') // NOT GOOD - HARDCODED
+        members: HateoasLinkBuilder.getNestedResourceLink(req, location._id, location.city, 'members') // NOT GOOD - HARDCODED
       },
       _embedded: {
         location
@@ -111,10 +121,53 @@ export class LocationController {
             city: location.city,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, location.id),
-              getById: HateoasLinkBuilder.getResourceLink(req, location.id, location.city),
+              getById: HateoasLinkBuilder.getResourceByIdLink(req, location.id, location.city),
               update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
               delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
-              members: HateoasLinkBuilder.getNextResourceLink(req, location.id, location.city, '/members')
+              members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, location.city, 'members')
+            }
+          }))
+        }
+      }
+      res
+        .json(halResponse)
+        .status(200)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Sends a JSON response containing a specific location's members.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async findMembersByLocation (req, res, next) {
+    try {
+      console.log('The req.params: ', req.params)
+      const location = {
+        location: req.params.id
+      }
+      const locationId = req.params.id
+
+      const membersOfLocation = await this.#memberService.getNestedResourceById(location)
+
+      console.log('Members of location: ', membersOfLocation)
+
+      const halResponse = {
+        _links: {
+          self: HateoasLinkBuilder.getNestedResourceLink(req, locationId, 'members'),
+          create: HateoasLinkBuilder.getCreateLink(req, 'location')
+        },
+        _embedded: {
+          members: membersOfLocation.map(member => ({
+            id: member.id,
+            name: member.name,
+            _links: {
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, locationId, 'members', member.id)
             }
           }))
         }
@@ -145,7 +198,7 @@ export class LocationController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, newLocation._id, newLocation.city),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newLocation._id, newLocation.city),
           update: HateoasLinkBuilder.getUpdateLink(req, newLocation._id, newLocation.city),
           delete: HateoasLinkBuilder.getDeleteLink(req, newLocation._id, newLocation.city)
         },
@@ -188,7 +241,7 @@ export class LocationController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, updatedLocation._id, updatedLocation.city),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedLocation._id, updatedLocation.city),
           create: HateoasLinkBuilder.getCreateLink(req),
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation._id, updatedLocation.city)
         },
@@ -198,7 +251,7 @@ export class LocationController {
       }
 
       res
-        .status(204)
+        .status(200)
         .json(halResponse)
         .end()
     } catch (error) {
@@ -228,7 +281,7 @@ export class LocationController {
         _links: {
           self: HateoasLinkBuilder.getPlainResourceLink(req, deletedLocationId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceLink(req, deletedLocationId._id, deletedLocationId.city),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedLocationId._id, deletedLocationId.city),
           create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {

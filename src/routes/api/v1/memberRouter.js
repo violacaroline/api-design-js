@@ -30,8 +30,14 @@ router.get('/', (req, res, next) => resolveMemberController(req).findAll(req, re
 // GET member/:id
 router.get('/:id', (req, res, next) => resolveMemberController(req).find(req, res, next))
 
+// GET member/:id/farms
+router.get('/:id/farms', (req, res, next) => resolveMemberController(req).findFarmsByMember(req, res, next))
+
 // POST - Create a member
 router.post('/', (req, res, next) => resolveMemberController(req).create(req, res, next))
+
+// PATCH member/:id
+router.patch('/:id', (req, res, next) => resolveMemberController(req).patch(req, res, next))
 
 // PUT member/:id
 router.put('/:id', (req, res, next) => resolveMemberController(req).update(req, res, next))

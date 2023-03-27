@@ -26,6 +26,9 @@ router.get('/', (req, res, next) => resolveFarmController(req).findAll(req, res,
 // GET farm/:id
 router.get('/:id', (req, res, next) => resolveFarmController(req).find(req, res, next))
 
+// GET farm/:id/products
+router.get('/:id/products', (req, res, next) => resolveFarmController(req).findProductsByFarm(req, res, next))
+
 // POST farm
 router.post('/', (req, res, next) => resolveFarmController(req).create(req, res, next))
 
