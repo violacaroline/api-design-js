@@ -31,6 +31,12 @@ import { ProductRepository } from '../repositories/ProductRepository.js'
 import { ProductService } from '../services/ProductService.js'
 import { ProductController } from '../controllers/ProductController.js'
 
+// WEBHOOK RELATED FILES
+import { WebHookModel } from '../models/WebHookModel.js'
+import { WebHookRepository } from '../repositories/WebHookRepository.js'
+import { WebHookService } from '../services/WebHookService.js'
+import { WebHookController } from '../controllers/WebHookController.js'
+
 const iocContainer = new IoCContainer()
 
 iocContainer.register('ConnectionString', process.env.DB_CONNECTION_STRING)
@@ -124,6 +130,29 @@ iocContainer.register('ProductServiceSingleton', ProductService, {
 iocContainer.register('ProductController', ProductController, {
   dependencies: [
     'ProductServiceSingleton'
+  ]
+})
+
+/* ====== REGISTER WEBHOOK RELATED ENTITIES ====== */
+iocContainer.register('WebHookModelType', WebHookModel, { type: true })
+
+iocContainer.register('WebHookRepositorySingleton', WebHookRepository, {
+  dependencies: [
+    'WebHookModelType'
+  ],
+  singleton: true
+})
+
+iocContainer.register('WebHookServiceSingleton', WebHookService, {
+  dependencies: [
+    'WebHookRepositorySingleton'
+  ],
+  singleton: true
+})
+
+iocContainer.register('WebHookController', WebHookController, {
+  dependencies: [
+    'WebHookServiceSingleton'
   ]
 })
 

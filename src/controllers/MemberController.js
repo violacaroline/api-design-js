@@ -123,33 +123,35 @@ export class MemberController {
    * @param {Function} next - Express next middleware function.
    */
   async find (req, res, next) {
-    const member = req.member
+    try {
+      const member = req.member
 
-    /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
-
-    const halResponse = {
-      _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, member._id, member.name),
-        get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, member._id, member.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, member._id, member.name),
-        farms: HateoasLinkBuilder.getNestedResourceLink(req, member._id, member.name, 'farms') // NOT GOOD - HARDCODED
-      },
-      _embedded: {
-        member: {
-          _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, member._id)
-          },
-          id: member.id,
-          name: member.name
+      /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
+      const halResponse = {
+        _links: {
+          self: HateoasLinkBuilder.getResourceByIdLink(req, member._id, member.name),
+          get: HateoasLinkBuilder.getBaseUrlLink(req),
+          update: HateoasLinkBuilder.getUpdateLink(req, member._id, member.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, member._id, member.name),
+          farms: HateoasLinkBuilder.getNestedResourceLink(req, member._id, member.name, 'farms') // NOT GOOD - HARDCODED
+        },
+        _embedded: {
+          member: {
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, member._id)
+            },
+            id: member.id,
+            name: member.name
+          }
         }
       }
+      res
+        .json(halResponse)
+        .status(200)
+        .end()
+    } catch (error) {
+      next(error)
     }
-
-    res
-      .json(halResponse)
-      .status(200)
-      .end()
   }
 
   /**

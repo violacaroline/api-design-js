@@ -6,7 +6,9 @@
  */
 
 import createError from 'http-errors'
+import axios from 'axios'
 import { ProductService } from '../services/ProductService.js'
+import { WebHookService } from '../services/WebHookService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
 /**
@@ -21,12 +23,21 @@ export class ProductController {
   #service
 
   /**
+   * The WebHookService.
+   *
+   * @type {WebHookService} - The WebHookService instance.
+   */
+  #webHookService
+
+  /**
    * Initializes a new instance.
    *
    * @param {ProductService} service - A service instantiated from a class with the same capabilities as ProductService.
+   * @param {WebHookService} webHookService - A service instantiated from a class with the same capabilities as WebHookService.
    */
-  constructor (service = new ProductService()) {
+  constructor (service = new ProductService(), webHookService = new WebHookService()) {
     this.#service = service
+    this.#webHookService = webHookService
   }
 
   /**
@@ -59,6 +70,42 @@ export class ProductController {
   }
 
   /**
+   * Notifies all WebHook URLs for certain event.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async notifyRegisteredWebhookUrls (req, res, next) {
+    // Here I could potentially filter in the DB rather???
+    const products = await this.#service.get()
+    const soldOutProducts = await products.filter(product => product.soldout === true)
+
+    // Get all registered webhooks subscribed to the product.soldout event
+    const webhooks = await this.#webHookService.get()
+    const soldoutWebhooks = await webhooks.filter(webhook => webhook.event === 'product.soldout')
+
+    // For each webhook, send an HTTP POST request with the relevant data
+    for (const webhook of soldoutWebhooks) {
+      try {
+        const data = []
+        soldOutProducts.forEach(product => {
+          data.push({ name: product.name, id: product.id })
+        })
+
+        await axios.post(webhook.url, {
+          event: 'product.soldout',
+          data
+        }, {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      } catch (error) {
+        console.error(`Error triggering webhook ${webhook.url}: ${error.message}`)
+      }
+    }
+  }
+
+  /**
    * Sends a JSON response containing a product.
    *
    * @param {object} req - Express request object.
@@ -79,14 +126,14 @@ export class ProductController {
       },
       _embedded: {
         product: {
-          _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, product._id)
-          },
           id: product.id,
           name: product.name,
           producer: product.producer,
           price: product.price,
-          soldout: product.soldout
+          soldout: product.soldout,
+          _links: {
+            self: HateoasLinkBuilder.getPlainResourceLink(req, product._id)
+          }
         }
       }
     }
@@ -117,6 +164,9 @@ export class ProductController {
           products: products.map(product => ({
             id: product.id,
             name: product.name,
+            producer: product.producer,
+            price: product.price,
+            soldout: product.soldout,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
               getById: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
@@ -150,6 +200,10 @@ export class ProductController {
         price: req.body.price,
         soldout: req.body.soldout
       })
+
+      if (newProduct.soldout) {
+        this.notifyRegisteredWebhookUrls()
+      }
 
       const halResponse = {
         _links: {
@@ -202,6 +256,10 @@ export class ProductController {
       await this.#service.replace(req.params.id, { name, producer, price, soldout })
 
       const updatedProduct = await this.#service.getById(req.params.id)
+
+      if (updatedProduct.soldout) {
+        this.notifyRegisteredWebhookUrls()
+      }
 
       const halResponse = {
         _links: {

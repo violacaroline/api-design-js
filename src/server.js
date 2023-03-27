@@ -32,7 +32,7 @@ try {
 
   // Check if other accept header then application/json is specified.
   app.use((req, res, next) => {
-    if ((req.headers.accept !== 'application/json') && !req.headers.accept) {
+    if (!req.headers.accept.includes('application/json') && !req.headers.accept.includes('*/*') && req.headers.accept) {
       const error = new Error('Unsupported media type requested.')
       error.status = 406
       return next(error)
