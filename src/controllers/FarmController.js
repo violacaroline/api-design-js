@@ -78,15 +78,13 @@ export class FarmController {
   async find (req, res, next) {
     const farm = req.farm
 
-    /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
-
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, farm._id, farm.name),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, farm.id, farm.name),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, farm._id, farm.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, farm._id, farm.name),
-        products: HateoasLinkBuilder.getNestedResourceLink(req, farm._id, 'products') // NOT GOOD - HARDCODED???
+        update: HateoasLinkBuilder.getUpdateLink(req, farm.id, farm.name),
+        delete: HateoasLinkBuilder.getDeleteLink(req, farm.id, farm.name),
+        products: HateoasLinkBuilder.getNestedResourceLink(req, farm.id, 'products') // NOT GOOD - HARDCODED???
       },
       _embedded: {
         farm: {
@@ -94,7 +92,7 @@ export class FarmController {
           name: farm.name,
           member: farm.member,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, farm._id)
+            self: HateoasLinkBuilder.getPlainResourceLink(req, farm.id)
           }
         }
       }
@@ -204,11 +202,11 @@ export class FarmController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newFarm._id, newFarm.name),
-          update: HateoasLinkBuilder.getUpdateLink(req, newFarm._id, newFarm.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newFarm._id, newFarm.name)
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newFarm.id, newFarm.name),
+          update: HateoasLinkBuilder.getUpdateLink(req, newFarm.id, newFarm.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newFarm.id, newFarm.name)
         },
         _embedded: {
           farm: {
@@ -216,7 +214,7 @@ export class FarmController {
             name: newFarm.name,
             member: newFarm.member,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm.id)
             }
           }
         }
@@ -254,11 +252,11 @@ export class FarmController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedFarm._id, updatedFarm.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedFarm.id, updatedFarm.name),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedFarm._id, updatedFarm.name)
+          delete: HateoasLinkBuilder.getDeleteLink(req, updatedFarm.id, updatedFarm.name)
         },
         _embedded: {
           farm: {
@@ -266,7 +264,7 @@ export class FarmController {
             name: updatedFarm.name,
             member: updatedFarm.member,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm.id)
             }
           }
         }

@@ -115,14 +115,12 @@ export class ProductController {
   async find (req, res, next) {
     const product = req.product
 
-    /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
-
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, product._id, product.name),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, product._id, product.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, product._id, product.name)
+        update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
+        delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
       },
       _embedded: {
         product: {
@@ -132,7 +130,7 @@ export class ProductController {
           price: product.price,
           soldout: product.soldout,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, product._id)
+            self: HateoasLinkBuilder.getPlainResourceLink(req, product.id)
           }
         }
       }
@@ -207,11 +205,11 @@ export class ProductController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newProduct._id, newProduct.name),
-          update: HateoasLinkBuilder.getUpdateLink(req, newProduct._id, newProduct.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newProduct._id, newProduct.name)
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newProduct.id, newProduct.name),
+          update: HateoasLinkBuilder.getUpdateLink(req, newProduct.id, newProduct.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newProduct.id, newProduct.name)
         },
         _embedded: {
           product: {
@@ -221,7 +219,7 @@ export class ProductController {
             price: newProduct.price,
             soldout: newProduct.soldout,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct.id)
             }
           }
         }
@@ -263,11 +261,11 @@ export class ProductController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedProduct._id, updatedProduct.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedProduct.id, updatedProduct.name),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedProduct._id, updatedProduct.name)
+          delete: HateoasLinkBuilder.getDeleteLink(req, updatedProduct.id, updatedProduct.name)
         },
         _embedded: {
           product: {
@@ -277,7 +275,7 @@ export class ProductController {
             price: updatedProduct.price,
             soldout: updatedProduct.soldout,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct.id)
             }
           }
         }

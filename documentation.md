@@ -93,3 +93,13 @@ Completely updates a product
 ### DELETE
 
 Deletes a product
+
+## Webhooks
+
+### POST
+
+Creates/registers a new webhook
+
+### DELETE
+
+Deletes/unregisters a webhook

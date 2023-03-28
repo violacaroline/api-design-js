@@ -78,22 +78,20 @@ export class LocationController {
   async find (req, res, next) {
     const location = req.location
 
-    /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
-
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, location._id, location.city),
+        self: HateoasLinkBuilder.getResourceByIdLink(req, location.id, location.city),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, location._id, location.city),
-        delete: HateoasLinkBuilder.getDeleteLink(req, location._id, location.city),
-        members: HateoasLinkBuilder.getNestedResourceLink(req, location._id, 'members') // NOT GOOD - HARDCODED???
+        update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
+        delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
+        members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, 'members') // NOT GOOD - HARDCODED???
       },
       _embedded: {
         location: {
           id: location.id,
           city: location.city,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, location._id)
+            self: HateoasLinkBuilder.getPlainResourceLink(req, location.id)
           }
         }
       }
@@ -200,18 +198,18 @@ export class LocationController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newLocation._id, newLocation.city),
-          update: HateoasLinkBuilder.getUpdateLink(req, newLocation._id, newLocation.city),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newLocation._id, newLocation.city)
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newLocation.id, newLocation.city),
+          update: HateoasLinkBuilder.getUpdateLink(req, newLocation.id, newLocation.city),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newLocation.id, newLocation.city)
         },
         _embedded: {
           location: {
             id: newLocation.id,
             city: newLocation.city,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation.id)
             }
           }
         }
@@ -249,18 +247,18 @@ export class LocationController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedLocation._id, updatedLocation.city),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedLocation.id, updatedLocation.city),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation._id, updatedLocation.city)
+          delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation.id, updatedLocation.city)
         },
         _embedded: {
           location: {
             id: updatedLocation.id,
             city: updatedLocation.city,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation.id)
             }
           }
         }

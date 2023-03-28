@@ -123,14 +123,13 @@ export class MemberController {
     try {
       const member = req.member
 
-      /* SHOULD I REALLY USE ._id - OR ID? WHAT IS THE REASON FOR UNDERSCORE? */
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getResourceByIdLink(req, member._id, member.name),
+          self: HateoasLinkBuilder.getResourceByIdLink(req, member.id, member.name),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          update: HateoasLinkBuilder.getUpdateLink(req, member._id, member.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, member._id, member.name),
-          farms: HateoasLinkBuilder.getNestedResourceLink(req, member._id, 'farms') // NOT GOOD - HARDCODED???
+          update: HateoasLinkBuilder.getUpdateLink(req, member.id, member.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, member.id, member.name),
+          farms: HateoasLinkBuilder.getNestedResourceLink(req, member.id, 'farms') // NOT GOOD - HARDCODED???
         },
         _embedded: {
           member: {
@@ -138,7 +137,7 @@ export class MemberController {
             name: member.name,
             location: member.location,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, member._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, member.id)
             }
           }
         }
@@ -253,11 +252,11 @@ export class MemberController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newMember._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, newMember.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newMember._id, newMember.name),
-          update: HateoasLinkBuilder.getUpdateLink(req, newMember._id, newMember.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newMember._id, newMember.name)
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, newMember.id, newMember.name),
+          update: HateoasLinkBuilder.getUpdateLink(req, newMember.id, newMember.name),
+          delete: HateoasLinkBuilder.getDeleteLink(req, newMember.id, newMember.name)
         },
         _embedded: {
           member: {
@@ -265,7 +264,7 @@ export class MemberController {
             name: newMember.name,
             location: newMember.location,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newMember._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newMember.id)
             }
           }
         }
@@ -312,11 +311,11 @@ export class MemberController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, patchedMember._id, patchedMember.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, patchedMember.id, patchedMember.name),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, patchedMember._id, patchedMember.name)
+          delete: HateoasLinkBuilder.getDeleteLink(req, patchedMember.id, patchedMember.name)
         },
         _embedded: {
           member: {
@@ -324,7 +323,7 @@ export class MemberController {
             name: patchedMember.name,
             location: patchedMember.location,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember.id)
             }
           }
         }
@@ -364,11 +363,11 @@ export class MemberController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember._id),
+          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember.id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedMember._id, updatedMember.name),
+          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedMember.id, updatedMember.name),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedMember._id, updatedMember.name)
+          delete: HateoasLinkBuilder.getDeleteLink(req, updatedMember.id, updatedMember.name)
         },
         _embedded: {
           member: {
@@ -376,7 +375,7 @@ export class MemberController {
             name: updatedMember.name,
             location: updatedMember.location,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember._id)
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember.id)
             }
           }
         }
