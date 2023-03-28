@@ -61,4 +61,25 @@ export class WebHookController {
       next(error)
     }
   }
+
+  /**
+   * Unregisters a URL as a WebHook.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async unRegisterWebhookUrl (req, res, next) {
+    try {
+      // AND HOW IS THAT A VISIBLE ID FOR SOMEONE? IS IT NOT ONLY FOR DATABASE?
+      const deletedWebHookId = req.params.id
+      await this.#service.delete(deletedWebHookId)
+
+      res
+        .status(204)
+        .end()
+    } catch (error) {
+      next(error)
+    }
+  }
 }

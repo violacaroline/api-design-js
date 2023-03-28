@@ -19,3 +19,6 @@ const resolveWebHookController = (req) => req.app.get('container').resolve('WebH
 
 // POST Register a new webhook url
 router.post('/register', (req, res, next) => resolveWebHookController(req).registerWebhookUrl(req, res, next))
+
+// DELETE Register a new webhook url
+router.delete('/unregister', (req, res, next) => resolveWebHookController(req).unRegisterWebhookUrl(req, res, next))

@@ -158,7 +158,7 @@ export class ProductController {
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req, 'product')
+          create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
           products: products.map(product => ({
@@ -215,14 +215,14 @@ export class ProductController {
         },
         _embedded: {
           product: {
-            _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id)
-            },
             id: newProduct.id,
             name: newProduct.name,
             producer: newProduct.producer,
             price: newProduct.price,
-            soldout: newProduct.soldout
+            soldout: newProduct.soldout,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct._id)
+            }
           }
         }
       }
@@ -271,14 +271,14 @@ export class ProductController {
         },
         _embedded: {
           product: {
-            _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id)
-            },
             id: updatedProduct.id,
             name: updatedProduct.name,
             producer: updatedProduct.producer,
             price: updatedProduct.price,
-            soldout: updatedProduct.soldout
+            soldout: updatedProduct.soldout,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct._id)
+            }
           }
         }
       }
@@ -312,18 +312,13 @@ export class ProductController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, deletedProductId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedProductId._id, deletedProductId.name),
           create: HateoasLinkBuilder.getCreateLink(req)
-        },
-        _embedded: {
-          product: deletedProductId
         }
       }
 
       res
-        .status(204)
+        .status(200)
         .json(halResponse)
         .end()
     } catch (error) {

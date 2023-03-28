@@ -86,10 +86,16 @@ export class LocationController {
         get: HateoasLinkBuilder.getBaseUrlLink(req),
         update: HateoasLinkBuilder.getUpdateLink(req, location._id, location.city),
         delete: HateoasLinkBuilder.getDeleteLink(req, location._id, location.city),
-        members: HateoasLinkBuilder.getNestedResourceLink(req, location._id, location.city, 'members') // NOT GOOD - HARDCODED
+        members: HateoasLinkBuilder.getNestedResourceLink(req, location._id, 'members') // NOT GOOD - HARDCODED???
       },
       _embedded: {
-        location
+        location: {
+          id: location.id,
+          city: location.city,
+          _links: {
+            self: HateoasLinkBuilder.getPlainResourceLink(req, location._id)
+          }
+        }
       }
     }
 
@@ -113,7 +119,7 @@ export class LocationController {
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req, 'location')
+          create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
           locations: locations.map(location => ({
@@ -124,7 +130,7 @@ export class LocationController {
               getById: HateoasLinkBuilder.getResourceByIdLink(req, location.id, location.city),
               update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
               delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
-              members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, location.city, 'members')
+              members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, 'members')
             }
           }))
         }
@@ -147,7 +153,6 @@ export class LocationController {
    */
   async findMembersByLocation (req, res, next) {
     try {
-      console.log('The req.params: ', req.params)
       const location = {
         location: req.params.id
       }
@@ -155,17 +160,16 @@ export class LocationController {
 
       const membersOfLocation = await this.#memberService.getNestedResourceById(location)
 
-      console.log('Members of location: ', membersOfLocation)
-
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getNestedResourceLink(req, locationId, 'members'),
-          create: HateoasLinkBuilder.getCreateLink(req, 'location')
+          create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
           members: membersOfLocation.map(member => ({
             id: member.id,
             name: member.name,
+            location: member.location,
             _links: {
               self: HateoasLinkBuilder.getNestedResourceByIdLink(req, locationId, 'members', member.id)
             }
@@ -203,7 +207,13 @@ export class LocationController {
           delete: HateoasLinkBuilder.getDeleteLink(req, newLocation._id, newLocation.city)
         },
         _embedded: {
-          location: newLocation
+          location: {
+            id: newLocation.id,
+            city: newLocation.city,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation._id)
+            }
+          }
         }
       }
 
@@ -246,7 +256,13 @@ export class LocationController {
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation._id, updatedLocation.city)
         },
         _embedded: {
-          location: updatedLocation
+          location: {
+            id: updatedLocation.id,
+            city: updatedLocation.city,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation._id)
+            }
+          }
         }
       }
 
@@ -279,13 +295,8 @@ export class LocationController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, deletedLocationId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedLocationId._id, deletedLocationId.city),
           create: HateoasLinkBuilder.getCreateLink(req)
-        },
-        _embedded: {
-          location: deletedLocationId
         }
       }
 

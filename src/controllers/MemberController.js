@@ -79,9 +79,6 @@ export class MemberController {
    */
   async login (req, res, next) {
     try {
-      console.log('Email: ', req.body.email)
-      console.log('Password: ', req.body.password)
-
       const member = await MemberModel.authenticate(req.body.email, req.body.password)
 
       const payload = {
@@ -93,7 +90,7 @@ export class MemberController {
       }
 
       const privateKey = Buffer.from(process.env.ACCESS_TOKEN_SECRET_PRIVATE, 'base64')
-      // Create the access token with the shorter lifespan.
+
       const accessToken = jwt.sign(payload, privateKey, {
         algorithm: 'RS256',
         expiresIn: 60 * 1000 * 20
@@ -133,15 +130,16 @@ export class MemberController {
           get: HateoasLinkBuilder.getBaseUrlLink(req),
           update: HateoasLinkBuilder.getUpdateLink(req, member._id, member.name),
           delete: HateoasLinkBuilder.getDeleteLink(req, member._id, member.name),
-          farms: HateoasLinkBuilder.getNestedResourceLink(req, member._id, member.name, 'farms') // NOT GOOD - HARDCODED
+          farms: HateoasLinkBuilder.getNestedResourceLink(req, member._id, 'farms') // NOT GOOD - HARDCODED???
         },
         _embedded: {
           member: {
+            id: member.id,
+            name: member.name,
+            location: member.location,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, member._id)
-            },
-            id: member.id,
-            name: member.name
+            }
           }
         }
       }
@@ -168,18 +166,19 @@ export class MemberController {
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req, 'member')
+          create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
           members: members.map(member => ({
             id: member.id,
             name: member.name,
+            location: member.location,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, member.id),
               getById: HateoasLinkBuilder.getResourceByIdLink(req, member.id, member.name),
               update: HateoasLinkBuilder.getUpdateLink(req, member.id, member.name),
               delete: HateoasLinkBuilder.getDeleteLink(req, member.id, member.name),
-              farms: HateoasLinkBuilder.getNestedResourceLink(req, member.id, member.name, 'farms')
+              farms: HateoasLinkBuilder.getNestedResourceLink(req, member.id, 'farms')
             }
           }))
         }
@@ -202,7 +201,6 @@ export class MemberController {
    */
   async findFarmsByMember (req, res, next) {
     try {
-      console.log('The req.params: ', req.params)
       const member = {
         member: req.params.id
       }
@@ -210,12 +208,10 @@ export class MemberController {
 
       const farmsOfMember = await this.#farmService.getNestedResourceById(member)
 
-      console.log('Farms of member: ', farmsOfMember)
-
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getNestedResourceLink(req, memberId, 'farms'),
-          create: HateoasLinkBuilder.getCreateLink(req, 'member')
+          create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
           farms: farmsOfMember.map(farm => ({
@@ -265,11 +261,12 @@ export class MemberController {
         },
         _embedded: {
           member: {
+            id: newMember.id,
+            name: newMember.name,
+            location: newMember.location,
             _links: {
               self: HateoasLinkBuilder.getPlainResourceLink(req, newMember._id)
-            },
-            id: newMember.id,
-            name: newMember.name
+            }
           }
         }
       }
@@ -311,7 +308,6 @@ export class MemberController {
 
       const patchedMember = await this.#service.getById(req.params.id)
 
-      console.log('Patched member from controller', patchedMember)
       await patchedMember.save()
 
       const halResponse = {
@@ -323,11 +319,14 @@ export class MemberController {
           delete: HateoasLinkBuilder.getDeleteLink(req, patchedMember._id, patchedMember.name)
         },
         _embedded: {
-          _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember._id)
-          },
-          id: patchedMember.id,
-          name: patchedMember.name
+          member: {
+            id: patchedMember.id,
+            name: patchedMember.name,
+            location: patchedMember.location,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, patchedMember._id)
+            }
+          }
         }
       }
 
@@ -372,11 +371,14 @@ export class MemberController {
           delete: HateoasLinkBuilder.getDeleteLink(req, updatedMember._id, updatedMember.name)
         },
         _embedded: {
-          _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember._id)
-          },
-          id: updatedMember.id,
-          name: updatedMember.name
+          member: {
+            id: updatedMember.id,
+            name: updatedMember.name,
+            location: updatedMember.location,
+            _links: {
+              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedMember._id)
+            }
+          }
         }
       }
 
@@ -409,13 +411,8 @@ export class MemberController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, deletedMemberId._id),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, deletedMemberId._id, deletedMemberId.name),
           create: HateoasLinkBuilder.getCreateLink(req)
-        },
-        _embedded: {
-          member: deletedMemberId
         }
       }
 
