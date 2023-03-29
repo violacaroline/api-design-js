@@ -212,7 +212,7 @@ export class MongooseRepositoryBase {
     }
 
     return this.#model
-      .findOneAndReplace({ cityPath: instance.cityPath }, updatedDocument, {
+      .findOneAndReplace({ slug: instance.slug }, updatedDocument, {
         ...options,
         returnDocument: 'after',
         runValidators: true

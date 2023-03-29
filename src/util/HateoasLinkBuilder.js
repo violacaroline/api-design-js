@@ -55,11 +55,11 @@ export class HateoasLinkBuilder {
    * Constructs link for specific resource with title and description.
    *
    * @param {*} req - Express request object.
-   * @param {*} resourceUrlName - The url name of the specific resource.
+   * @param {*} slug - The slug of the specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getResourceByNameLink (req, resourceUrlName) {
-    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceUrlName}`)
+  static getResourceBySlugLink (req, slug) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${slug}`)
     return {
       href: url,
       method: 'GET',
@@ -108,12 +108,12 @@ export class HateoasLinkBuilder {
    * Constructs link for specific resource's nested resource in the hierarchy.
    *
    * @param {*} req - Express request object.
-   * @param {*} resourceName - The name of the specific resource.
+   * @param {*} slug - The slug of the specific resource.
    * @param {*} nestedResource - The specific resource's nested resource.
    * @returns {object} - An object containing the link.
    */
-  static getNestedResourceByNameLink (req, resourceName, nestedResource) {
-    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceName}/${nestedResource}`)
+  static getNestedResourceBySlugLink (req, slug, nestedResource) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.baseUrl}/${slug}/${nestedResource}`)
     return {
       href: url,
       method: 'GET',
@@ -132,7 +132,7 @@ export class HateoasLinkBuilder {
    */
   static getPageLink (req, page, perPage) {
     const baseUrl = req.protocol + '://' + req.get('host') + req.originalUrl.split('?')[0]
-    const queryString = `page=${page}&perPage=${perPage}`
+    const queryString = `page=${page}&per-page=${perPage}`
     return `${baseUrl}?${queryString}`
   }
 
@@ -176,15 +176,15 @@ export class HateoasLinkBuilder {
   }
 
   /**
-   * Constructs link for updating a specific resource by name.
+   * Constructs link for updating a specific resource by slug.
    *
    * @param {*} req - Express request object.
-   * @param {*} resourceUrlName - The url name of the specific resource.
+   * @param {*} slug - The slug of the specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getUpdateLinkByName (req, resourceUrlName) {
+  static getUpdateLinkBySlug (req, slug) {
     const url = new URL(
-        `${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceUrlName}`
+        `${req.protocol}://${req.get('host')}${req.baseUrl}/${slug}`
     )
     return {
       href: url,
@@ -214,15 +214,15 @@ export class HateoasLinkBuilder {
   }
 
   /**
-   * Constructs link for deleting a specific resource by name.
+   * Constructs link for deleting a specific resource by slug.
    *
    * @param {*} req - Express request object.
-   * @param {*} resourceUrlName - The url name of the specific resource.
+   * @param {*} slug - The slug of the specific resource.
    * @returns {object} - An object containing the link.
    */
-  static getDeleteLinkByName (req, resourceUrlName) {
+  static getDeleteLinkBySlug (req, slug) {
     const url = new URL(
-        `${req.protocol}://${req.get('host')}${req.baseUrl}/${resourceUrlName}`
+        `${req.protocol}://${req.get('host')}${req.baseUrl}/${slug}`
     )
     return {
       href: url,

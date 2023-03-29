@@ -17,23 +17,23 @@ export const router = express.Router()
  */
 const resolveLocationController = (req) => req.app.get('container').resolve('LocationController')
 
-// Provide req.location to the route if :name is present in the route path.
-router.param('name', (req, res, next, name) => resolveLocationController(req).loadLocation(req, res, next, name))
+// Provide req.location to the route if :slug is present in the route path.
+router.param('slug', (req, res, next, slug) => resolveLocationController(req).loadLocation(req, res, next, slug))
 
 // GET locations
 router.get('/', (req, res, next) => resolveLocationController(req).findAll(req, res, next))
 
-// GET location/:name
-router.get('/:name', (req, res, next) => resolveLocationController(req).find(req, res, next))
+// GET location/:slug
+router.get('/:slug', (req, res, next) => resolveLocationController(req).find(req, res, next))
 
-// GET location/:name/members
-router.get('/:name/members', (req, res, next) => resolveLocationController(req).findMembersByLocation(req, res, next))
+// GET location/:slug/members
+router.get('/:slug/members', (req, res, next) => resolveLocationController(req).findMembersByLocation(req, res, next))
 
 // POST location
 router.post('/', (req, res, next) => resolveLocationController(req).create(req, res, next))
 
-// PUT location/:name
-router.put('/:name', (req, res, next) => resolveLocationController(req).update(req, res, next))
+// PUT location/:slug
+router.put('/:slug', (req, res, next) => resolveLocationController(req).update(req, res, next))
 
-// DELETE location/:name
-router.delete('/:name', (req, res, next) => resolveLocationController(req).delete(req, res, next))
+// DELETE location/:slug
+router.delete('/:slug', (req, res, next) => resolveLocationController(req).delete(req, res, next))
