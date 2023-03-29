@@ -23,7 +23,6 @@ const schema = new mongoose.Schema({
   },
   location: {
     type: String,
-    required: true,
     trim: true,
     minlength: 2
   },

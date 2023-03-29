@@ -240,7 +240,7 @@ export class MemberController {
       }
       const memberId = req.params.id
 
-      const farmsOfMember = await this.#farmService.getNestedResourceById(member)
+      const farmsOfMember = await this.#farmService.getAllResourcesByFilter(member)
 
       const halResponse = {
         _links: {

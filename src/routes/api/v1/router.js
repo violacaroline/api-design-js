@@ -6,6 +6,7 @@
  */
 
 import express from 'express'
+import { FrootBootController } from '../../../controllers/FrootBootController.js'
 import { router as locationRouter } from './locationRouter.js'
 import { router as memberRouter } from './memberRouter.js'
 import { router as farmRouter } from './farmRouter.js'
@@ -14,7 +15,9 @@ import { router as webHookRouter } from './webHookRouter.js'
 
 export const router = express.Router()
 
-router.get('/', (req, res) => res.json({ message: 'Hooray! Welcome to version 1 of this very simple Froot Boot RESTful API!' }))
+const frootBootController = new FrootBootController()
+
+router.get('/', (req, res, next) => frootBootController.get(req, res, next))
 
 router.use('/locations', locationRouter)
 
