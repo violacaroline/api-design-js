@@ -17,6 +17,14 @@ export const router = express.Router()
  */
 const resolveMemberController = (req) => req.app.get('container').resolve('MemberController')
 
+/**
+ * Resolves a FarmController object from the IoC container.
+ *
+ * @param {object} req - Express request object.
+ * @returns {object} An object that can act as a FarmController object.
+ */
+const resolveFarmController = (req) => req.app.get('container').resolve('FarmController')
+
 // Provide req.member to the route if :id is present in the route path.
 router.param('id', (req, res, next, id) => resolveMemberController(req).loadMember(req, res, next, id))
 
@@ -32,6 +40,9 @@ router.get('/:id', (req, res, next) => resolveMemberController(req).find(req, re
 
 // GET member/:id/farms
 router.get('/:id/farms', (req, res, next) => resolveMemberController(req).findFarmsByMember(req, res, next))
+
+// POST member/:id/farms
+router.post('/:id/farms', (req, res, next) => resolveFarmController(req).create(req, res, next))
 
 // POST - Create a member
 router.post('/', (req, res, next) => resolveMemberController(req).create(req, res, next))

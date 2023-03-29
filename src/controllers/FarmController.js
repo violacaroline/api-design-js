@@ -157,7 +157,7 @@ export class FarmController {
       }
       const farmId = req.params.id
 
-      const productsOfFarm = await this.#productService.getNestedResourceById(farm)
+      const productsOfFarm = await this.#productService.getAllResourcesByFilter(farm)
 
       const halResponse = {
         _links: {
@@ -197,7 +197,7 @@ export class FarmController {
     try {
       const newFarm = await this.#service.insert({
         name: req.body.name,
-        member: req.body.member
+        member: req.member.id
       })
 
       const halResponse = {

@@ -17,7 +17,6 @@ const schema = new mongoose.Schema({
   },
   member: {
     type: String,
-    required: [true, 'Owning member is required.'],
     trim: true,
     minlength: 1
   }
