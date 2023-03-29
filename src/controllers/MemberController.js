@@ -162,13 +162,27 @@ export class MemberController {
     try {
       const members = await this.#service.get()
 
+      const totalCount = members.length
+      const perPage = parseInt(req.query.perPage) || 5
+      const page = parseInt(req.query.page) || 1
+      const totalPages = Math.ceil(totalCount / perPage)
+
+      const startIndex = (page - 1) * perPage
+      const endIndex = startIndex + perPage
+
+      const paginatedMembers = members.slice(startIndex, endIndex)
+
       const halResponse = {
         _links: {
           self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          create: HateoasLinkBuilder.getCreateLink(req),
+          prev: page > 1 ? HateoasLinkBuilder.getPageLink(req, page - 1, perPage) : null,
+          next: page < totalPages ? HateoasLinkBuilder.getPageLink(req, page + 1, perPage) : null,
+          last: HateoasLinkBuilder.getPageLink(req, totalPages, perPage),
+          count: totalCount
         },
         _embedded: {
-          members: members.map(member => ({
+          members: paginatedMembers.map(member => ({
             id: member.id,
             name: member.name,
             location: member.location,
@@ -182,6 +196,27 @@ export class MemberController {
           }))
         }
       }
+
+      // const halResponse = {
+      //   _links: {
+      //     self: HateoasLinkBuilder.getBaseUrlLink(req),
+      //     create: HateoasLinkBuilder.getCreateLink(req)
+      //   },
+      //   _embedded: {
+      //     members: members.map(member => ({
+      //       id: member.id,
+      //       name: member.name,
+      //       location: member.location,
+      //       _links: {
+      //         self: HateoasLinkBuilder.getPlainResourceLink(req, member.id),
+      //         getById: HateoasLinkBuilder.getResourceByIdLink(req, member.id, member.name),
+      //         update: HateoasLinkBuilder.getUpdateLink(req, member.id, member.name),
+      //         delete: HateoasLinkBuilder.getDeleteLink(req, member.id, member.name),
+      //         farms: HateoasLinkBuilder.getNestedResourceLink(req, member.id, 'farms')
+      //       }
+      //     }))
+      //   }
+      // }
       res
         .json(halResponse)
         .status(200)

@@ -30,13 +30,23 @@ export class MongooseServiceBase {
   }
 
   /**
-   * Gets all documents with a certain ID - i.e parent.
+   * Gets a documents with a certain filter.
    *
-   * @param {object} nestedResourceId - ...
+   * @param {object} filterBy - ...
    * @returns {Promise<object>} Promise resolved with all documents as plain JavaScript objects.
    */
-  async getNestedResourceById (nestedResourceId) {
-    return this._repository.get(nestedResourceId)
+  async getResourceByFilter (filterBy) {
+    return this._repository.getOne(filterBy)
+  }
+
+  /**
+   * Gets all documents with a certain filter.
+   *
+   * @param {object} filterBy - ...
+   * @returns {Promise<object>} Promise resolved with all documents as plain JavaScript objects.
+   */
+  async getAllResourcesByFilter (filterBy) {
+    return this._repository.get(filterBy)
   }
 
   /**
@@ -84,6 +94,17 @@ export class MongooseServiceBase {
   }
 
   /**
+   * Replaces a document by name.
+   *
+   * @param {string} name - The value of the name for the document to update.
+   * @param {object} replaceData - The new data to replace the existing document with.
+   * @returns {Promise<object>} Promise resolved with the updated document.
+   */
+  async replaceByName (name, replaceData) {
+    return this._repository.replaceByName(name, replaceData)
+  }
+
+  /**
    * Deletes a document.
    *
    * @param {number} id - The value of the id for the document to delete.
@@ -91,5 +112,15 @@ export class MongooseServiceBase {
    */
   async delete (id) {
     return this._repository.delete(id)
+  }
+
+  /**
+   * Deletes a document by name.
+   *
+   * @param {string} name - The value of the id for the document to delete.
+   * @returns {Promise<object>} Promise resolved with the removed document as a plain JavaScript object.
+   */
+  async deleteByName (name) {
+    return this._repository.deleteByName(name)
   }
 }

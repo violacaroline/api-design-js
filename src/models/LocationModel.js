@@ -11,7 +11,14 @@ import mongoose from 'mongoose'
 const schema = new mongoose.Schema({
   city: {
     type: String,
+    unique: true,
     required: [true, 'City is required.'],
+    trim: true,
+    minlength: 1
+  },
+  cityPath: {
+    type: String,
+    unique: true,
     trim: true,
     minlength: 1
   }

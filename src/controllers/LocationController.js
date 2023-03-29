@@ -40,17 +40,17 @@ export class LocationController {
   }
 
   /**
-   * Provide req.location to the route if :id is present.
+   * Provide req.location to the route if :name is present.
    *
    * @param {object} req - Express request object.
    * @param {object} res - Express response object.
    * @param {Function} next - Express next middleware function.
-   * @param {string} id - The value of the id for the location to load.
+   * @param {string} name - The value of the id for the location to load.
    */
-  async loadLocation (req, res, next, id) {
+  async loadLocation (req, res, next, name) {
     try {
       // Get the location.
-      const location = await this.#service.getById(id)
+      const location = await this.#service.getResourceByFilter({ cityPath: name })
 
       // If no location found send a 404 (Not Found).
       if (!location) {
@@ -80,18 +80,20 @@ export class LocationController {
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, location.id, location.city),
+        self: HateoasLinkBuilder.getResourceByNameLink(req, location.cityPath),
         get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
-        delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
-        members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, 'members') // NOT GOOD - HARDCODED???
+        create: HateoasLinkBuilder.getCreateLink(req),
+        update: HateoasLinkBuilder.getUpdateLinkByName(req, location.cityPath),
+        delete: HateoasLinkBuilder.getDeleteLinkByName(req, location.cityPath),
+        members: HateoasLinkBuilder.getNestedResourceByNameLink(req, location.cityPath, 'members') // NOT GOOD - HARDCODED???
       },
       _embedded: {
         location: {
           id: location.id,
           city: location.city,
+          cityPath: location.cityPath,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, location.id)
+            self: HateoasLinkBuilder.getResourceByNameLink(req, location.cityPath)
           }
         }
       }
@@ -123,12 +125,14 @@ export class LocationController {
           locations: locations.map(location => ({
             id: location.id,
             city: location.city,
+            cityPath: location.cityPath,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, location.id),
-              getById: HateoasLinkBuilder.getResourceByIdLink(req, location.id, location.city),
-              update: HateoasLinkBuilder.getUpdateLink(req, location.id, location.city),
-              delete: HateoasLinkBuilder.getDeleteLink(req, location.id, location.city),
-              members: HateoasLinkBuilder.getNestedResourceLink(req, location.id, 'members')
+              self: HateoasLinkBuilder.getResourceByNameLink(req, location.cityPath),
+              getByName: HateoasLinkBuilder.getResourceByNameLink(req, location.cityPath),
+              create: HateoasLinkBuilder.getCreateLink(req),
+              update: HateoasLinkBuilder.getUpdateLinkByName(req, location.cityPath),
+              delete: HateoasLinkBuilder.getDeleteLinkByName(req, location.cityPath),
+              members: HateoasLinkBuilder.getNestedResourceByNameLink(req, location.cityPath, 'members')
             }
           }))
         }
@@ -152,15 +156,15 @@ export class LocationController {
   async findMembersByLocation (req, res, next) {
     try {
       const location = {
-        location: req.params.id
+        location: req.params.name
       }
-      const locationId = req.params.id
+      const locationUrlName = req.params.name
 
-      const membersOfLocation = await this.#memberService.getNestedResourceById(location)
+      const membersOfLocation = await this.#memberService.getAllResourcesByFilter(location)
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getNestedResourceLink(req, locationId, 'members'),
+          self: HateoasLinkBuilder.getNestedResourceByNameLink(req, locationUrlName, 'members'),
           create: HateoasLinkBuilder.getCreateLink(req)
         },
         _embedded: {
@@ -169,7 +173,7 @@ export class LocationController {
             name: member.name,
             location: member.location,
             _links: {
-              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, locationId, 'members', member.id)
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, locationUrlName, 'members', member.id)
             }
           }))
         }
@@ -192,24 +196,26 @@ export class LocationController {
    */
   async create (req, res, next) {
     try {
-      const newLocation = await this.#service.insert({
-        city: req.body.city
-      })
+      const { city } = req.body
+      const cityPath = city.toLowerCase().replaceAll(' ', '-')
+
+      const newLocation = await this.#service.insert({ city, cityPath })
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation.id),
+          self: HateoasLinkBuilder.getResourceByNameLink(req, newLocation.cityPath),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newLocation.id, newLocation.city),
-          update: HateoasLinkBuilder.getUpdateLink(req, newLocation.id, newLocation.city),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newLocation.id, newLocation.city)
+          getByName: HateoasLinkBuilder.getResourceByNameLink(req, newLocation.cityPath),
+          update: HateoasLinkBuilder.getUpdateLinkByName(req, newLocation.cityPath),
+          delete: HateoasLinkBuilder.getDeleteLinkByName(req, newLocation.cityPath)
         },
         _embedded: {
           location: {
             id: newLocation.id,
             city: newLocation.city,
+            cityPath: newLocation.cityPath,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newLocation.id)
+              self: HateoasLinkBuilder.getResourceByNameLink(req, newLocation.cityPath)
             }
           }
         }
@@ -241,24 +247,24 @@ export class LocationController {
     try {
       const { city } = req.body
 
-      await this.#service.replace(req.params.id, { city })
+      await this.#service.replaceByName({ cityPath: req.params.name }, { city })
 
-      const updatedLocation = await this.#service.getById(req.params.id)
+      const updatedLocation = await this.#service.getResourceByFilter({ cityPath: req.params.name })
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation.id),
+          self: HateoasLinkBuilder.getUpdateLinkByName(req, updatedLocation.cityPath),
           get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedLocation.id, updatedLocation.city),
+          getByName: HateoasLinkBuilder.getResourceByNameLink(req, updatedLocation.cityPath),
           create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedLocation.id, updatedLocation.city)
+          delete: HateoasLinkBuilder.getDeleteLinkByName(req, updatedLocation.cityPath)
         },
         _embedded: {
           location: {
             id: updatedLocation.id,
             city: updatedLocation.city,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedLocation.id)
+              self: HateoasLinkBuilder.getResourceByNameLink(req, updatedLocation.cityPath)
             }
           }
         }
@@ -288,8 +294,8 @@ export class LocationController {
    */
   async delete (req, res, next) {
     try {
-      const deletedLocationId = req.params.id
-      await this.#service.delete(deletedLocationId)
+      const deletedLocation = req.params.name
+      await this.#service.deleteByName({ cityPath: deletedLocation })
 
       const halResponse = {
         _links: {

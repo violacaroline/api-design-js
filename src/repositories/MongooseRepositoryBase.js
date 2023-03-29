@@ -121,6 +121,19 @@ export class MongooseRepositoryBase {
   }
 
   /**
+   * Deletes a document.
+   *
+   * @param {string} name - Value of the documents id to delete.
+   * @param {object} [options] - See Query.prototype.setOptions().
+   * @returns {Promise<object>} Promise resolved with the removed document.
+   */
+  async deleteByName (name, options) {
+    return this.#model
+      .findOneAndDelete(name, options)
+      .exec()
+  }
+
+  /**
    * Updates a document according to the new data.
    *
    * @param {string} id - Value of the documents id to update.
@@ -167,6 +180,39 @@ export class MongooseRepositoryBase {
 
     return this.#model
       .findOneAndReplace({ _id: id }, updatedDocument, {
+        ...options,
+        returnDocument: 'after',
+        runValidators: true
+      })
+      .exec()
+  }
+
+  /**
+   * Replaces a document according to the new data.
+   *
+   * @param {string} instance - Value of the documents name to replace.
+   * @param {object} replaceData - The new data to replace the existing document with.
+   * @param {object} [options] - See Query.prototype.setOptions().
+   * @throws {Error} If the specified data contains invalid property names.
+   * @returns {Promise<object>} Promise resolved with the updated document.
+   */
+  async replaceByName (instance, replaceData, options) {
+    const document = await this.#model.findOne(instance).exec()
+    if (!document) {
+      throw new Error(`Document with name ${instance} not found`)
+    }
+
+    const updatedDocument = {
+      ...document.toObject(),
+      ...replaceData
+    }
+
+    if (replaceData.password) {
+      updatedDocument.password = await bcrypt.hash(replaceData.password, 10)
+    }
+
+    return this.#model
+      .findOneAndReplace({ cityPath: instance.cityPath }, updatedDocument, {
         ...options,
         returnDocument: 'after',
         runValidators: true
