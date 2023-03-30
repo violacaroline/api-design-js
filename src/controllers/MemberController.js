@@ -102,7 +102,10 @@ export class MemberController {
           name: member.name,
           user_id: member.id,
           access_token: accessToken,
-          message: 'You are logged in'
+          message: 'You are logged in',
+          _links: {
+            get: HateoasLinkBuilder.getBaseUrlLink(req)
+          }
         })
     } catch (error) {
       // Authentication failed.
@@ -197,27 +200,6 @@ export class MemberController {
           }))
         }
       }
-
-      // const halResponse = {
-      //   _links: {
-      //     self: HateoasLinkBuilder.getBaseUrlLink(req),
-      //     create: HateoasLinkBuilder.getCreateLink(req)
-      //   },
-      //   _embedded: {
-      //     members: members.map(member => ({
-      //       id: member.id,
-      //       name: member.name,
-      //       location: member.location,
-      //       _links: {
-      //         self: HateoasLinkBuilder.getPlainResourceLink(req, member.id),
-      //         getById: HateoasLinkBuilder.getResourceByIdLink(req, member.id, member.name),
-      //         update: HateoasLinkBuilder.getUpdateLink(req, member.id, member.name),
-      //         delete: HateoasLinkBuilder.getDeleteLink(req, member.id, member.name),
-      //         farms: HateoasLinkBuilder.getNestedResourceLink(req, member.id, 'farms')
-      //       }
-      //     }))
-      //   }
-      // }
       res
         .json(halResponse)
         .status(200)

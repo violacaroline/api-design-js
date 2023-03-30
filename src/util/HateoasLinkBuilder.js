@@ -306,8 +306,6 @@ export class HateoasLinkBuilder {
   }
 
   /**
-   * THIS PROBABLY NEEDS BE BUILT LIKE UPDATE/DELETE IF CHANGING POST ROUTES
-   *
    * Constructs link for creating new resource.
    *
    * @param {*} req - Express request object.

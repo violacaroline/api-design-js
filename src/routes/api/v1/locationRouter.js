@@ -6,6 +6,7 @@
  */
 
 import express from 'express'
+import { MemberModel } from '../../../models/MemberModel.js'
 
 export const router = express.Router()
 
@@ -30,10 +31,10 @@ router.get('/:slug', (req, res, next) => resolveLocationController(req).find(req
 router.get('/:slug/members', (req, res, next) => resolveLocationController(req).findMembersByLocation(req, res, next))
 
 // POST location
-router.post('/', (req, res, next) => resolveLocationController(req).create(req, res, next))
+router.post('/', MemberModel.authenticateJWT, (req, res, next) => resolveLocationController(req).create(req, res, next))
 
 // PUT location/:slug
-router.put('/:slug', (req, res, next) => resolveLocationController(req).update(req, res, next))
+router.put('/:slug', MemberModel.authenticateJWT, (req, res, next) => resolveLocationController(req).update(req, res, next))
 
 // DELETE location/:slug
-router.delete('/:slug', (req, res, next) => resolveLocationController(req).delete(req, res, next))
+router.delete('/:slug', MemberModel.authenticateJWT, (req, res, next) => resolveLocationController(req).delete(req, res, next))

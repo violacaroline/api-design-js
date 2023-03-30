@@ -16,7 +16,16 @@ export class FrootBootController {
         _links: {
           self: HateoasLinkBuilder.getBaseUrlLink(req),
           locations: HateoasLinkBuilder.getBaseUrlLink(req).href + '/locations',
-          members: HateoasLinkBuilder.getBaseUrlLink(req).href + '/members'
+          members: {
+            href: HateoasLinkBuilder.getCreateLink(req).href + '/members',
+            method: 'POST',
+            title: 'Create a member'
+          },
+          login: {
+            href: HateoasLinkBuilder.getCreateLink(req).href + '/members/login',
+            method: 'POST',
+            title: 'Login to browse all resources'
+          }
         }
       }
       res
