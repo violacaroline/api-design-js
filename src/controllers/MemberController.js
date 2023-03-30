@@ -52,7 +52,6 @@ export class MemberController {
   async loadMember (req, res, next, id) {
     try {
       // Get the Member.
-      console.log('Probs farm id: ', id)
       const member = await this.#service.getById(id)
 
       // If no member found send a 404 (Not Found).

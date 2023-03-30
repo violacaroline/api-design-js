@@ -71,7 +71,6 @@ export class WebHookController {
    */
   async unRegisterWebhookUrl (req, res, next) {
     try {
-      // AND HOW IS THAT A VISIBLE ID FOR SOMEONE? IS IT NOT ONLY FOR DATABASE?
       const deletedWebHookId = req.params.id
       await this.#service.delete(deletedWebHookId)
 
