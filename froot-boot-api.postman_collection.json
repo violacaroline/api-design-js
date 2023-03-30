@@ -1,0 +1,925 @@
+{
+	"info": {
+		"_postman_id": "3c89df5b-184e-44e0-aa60-7499de92ac66",
+		"name": "Froot Boot API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20082063"
+	},
+	"item": [
+		{
+			"name": "locations",
+			"item": [
+				{
+					"name": "getLocations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateLocation",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"city\": \"Stockholm\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations/stockholm",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations",
+								"stockholm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLocation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations/stockholm",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations",
+								"stockholm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createLocation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"city\": \"Oskarshamn\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteLocation",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations/gothenburg",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations",
+								"gothenburg"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Responsible for requests to /locations"
+		},
+		{
+			"name": "members",
+			"item": [
+				{
+					"name": "createMember",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"DeleteTestMember\",\r\n    \"location\": \"stockholm\",\r\n    \"phone\": \"12345678\",\r\n    \"email\": \"DeleteTestMember@TestMember.com\",\r\n    \"password\": \"TestMember\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMember",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDI1ZDQ2MjJlM2Y4MzFlNTRiZDljMzQiLCJuYW1lIjoiVGVzdE1lbWJlciIsImxvY2F0aW9uIjoic3RvY2tob2xtIiwicGhvbmUiOiIxMjM0NTY3OCIsImVtYWlsIjoiVGVzdE1lbWJlckBUZXN0TWVtYmVyLmNvbSIsImlhdCI6MTY4MDIwMjA5MCwiZXhwIjoxNjgxNDAyMDkwfQ.CECp0Ue2DAbeWCVi5OqsNYQnCOkpEVERcNv33esDB9zY0pCmTvUQ806TAeE6osfQ_DDgDrpq173X7vLRh3fwHyCQXh1OJAVyWgS_2Jo4xIUG23Av-AzUHrSJDKjYEU7mGHhvkJaS-C_7O41mF0dZJ63fBQ8OaecDI1I_TiK5pTadoKRx3fEGjxlKyTyky4jExeGbahYu_OPKL56qcDNNB8TxauFByHKC8Q2d0yvZuB7FdIxicSCXW_QF9l4r_XXyRpgB6O1x0qKsmz1sbvPEs3YcSleioi9usDPSfxoyEAjnCA_yIbzKqVrYVvLoff8MldQKwv6KvrPhdZlIIw0IJA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "loginMember",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"TestMember@TestMember.com\",\r\n    \"password\": \"TestMember\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/login",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateMember",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"TestMember\",\r\n    \"location\": \"stockholm\",\r\n    \"phone\": \"12345678\",\r\n    \"email\": \"TestMember@TestMember.com\",\r\n    \"password\": \"TestMember\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patchMember",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone\": \"0702018918\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMember",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/64260ec88825d7106f36c323",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"64260ec88825d7106f36c323"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMembers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMembersByLocation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/locations/stockholm/members",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"locations",
+								"stockholm",
+								"members"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Responsible for requests to /members"
+		},
+		{
+			"name": "farms",
+			"item": [
+				{
+					"name": "createFarm",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"TestMemberFarmFour\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFarmsByMember",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateFarm",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"NotTestMemberFarmFour\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/6426109b8825d7106f36c34a",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"6426109b8825d7106f36c34a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFarm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/642610968825d7106f36c347",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"642610968825d7106f36c347"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteFarm",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/6426109b8825d7106f36c34a",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"6426109b8825d7106f36c34a"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Responsible for requests to /farms"
+		},
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "createProduct",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"SecondWebhookTestFarmProduct\",\r\n    \"price\": 1000,\r\n    \"soldout\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/642610878825d7106f36c341/products",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"642610878825d7106f36c341",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProductsByFarm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/6425df55fbc0dd38e49749cc/products",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"6425df55fbc0dd38e49749cc",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateProduct",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"ThirdWebhookProduct\",\r\n    \"price\": 500,\r\n    \"soldout\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/642610878825d7106f36c341/products/642613758825d7106f36c365",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"642610878825d7106f36c341",
+								"products",
+								"642613758825d7106f36c365"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProduct",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/642610878825d7106f36c341/products/642612df8825d7106f36c35c",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"642610878825d7106f36c341",
+								"products",
+								"642612df8825d7106f36c35c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteProduct",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members/6425d4622e3f831e54bd9c34/farms/642610878825d7106f36c341/products/642612df8825d7106f36c35c",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members",
+								"6425d4622e3f831e54bd9c34",
+								"farms",
+								"642610878825d7106f36c341",
+								"products",
+								"642612df8825d7106f36c35c"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Responsible for requests to /products"
+		},
+		{
+			"name": "webhooks",
+			"item": [
+				{
+					"name": "registerWebHook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"url\": \"https://webhook.site/065667c8-f057-4312-a1b5-451d6cf4ea8d\",\r\n    \"event\": \"product.soldout\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/webhooks/register",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"webhooks",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unregisterWebHook",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/froot-boot/webhooks/unregister/6421d583751d3f31ac81132c",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"froot-boot",
+								"webhooks",
+								"unregister",
+								"6421d583751d3f31ac81132c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "errors",
+			"item": [
+				{
+					"name": "createMemberWithoutPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Caroline\",\r\n    \"location\": \"cancun\",\r\n    \"phone\": \"Cancun\",\r\n    \"email\": \"Caroline@Caroline.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/froot-boot/api/v1/members",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"froot-boot",
+								"api",
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createMemberDuplicateEmail",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"DeleteTestMember\",\r\n    \"location\": \"stockholm\",\r\n    \"phone\": \"12345678\",\r\n    \"email\": \"TestMember@TestMember.com\",\r\n    \"password\": \"TestMember\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMembersWithAFaultyJWT",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cscloud7-156.lnu.se/api-app/froot-boot/api/v1/members",
+							"protocol": "https",
+							"host": [
+								"cscloud7-156",
+								"lnu",
+								"se"
+							],
+							"path": [
+								"api-app",
+								"froot-boot",
+								"api",
+								"v1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
