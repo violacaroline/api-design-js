@@ -8,7 +8,7 @@
 import createError from 'http-errors'
 import { LocationService } from '../services/LocationService.js'
 import { MemberService } from '../services/MemberService.js'
-import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
+import { HateoasLinkBuilder } from '../util/HateoasLinkBuilder.js'
 
 /**
  * Encapsulates a controller.

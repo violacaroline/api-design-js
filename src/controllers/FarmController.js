@@ -7,7 +7,7 @@
 
 import createError from 'http-errors'
 import { FarmService } from '../services/FarmService.js'
-import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
+import { HateoasLinkBuilder } from '../util/HateoasLinkBuilder.js'
 
 /**
  * Encapsulates a controller.

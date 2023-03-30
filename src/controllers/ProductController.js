@@ -9,7 +9,7 @@ import createError from 'http-errors'
 import axios from 'axios'
 import { ProductService } from '../services/ProductService.js'
 import { WebHookService } from '../services/WebHookService.js'
-import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
+import { HateoasLinkBuilder } from '../util/HateoasLinkBuilder.js'
 
 /**
  * Encapsulates a controller.
@@ -145,47 +145,6 @@ export class ProductController {
       .status(200)
       .end()
   }
-
-  // /**
-  //  * Sends a JSON response containing all products.
-  //  *
-  //  * @param {object} req - Express request object.
-  //  * @param {object} res - Express response object.
-  //  * @param {Function} next - Express next middleware function.
-  //  */
-  // async findAll (req, res, next) {
-  //   try {
-  //     const products = await this.#service.get()
-
-  //     const halResponse = {
-  //       _links: {
-  //         self: HateoasLinkBuilder.getBaseUrlLink(req),
-  //         create: HateoasLinkBuilder.getCreateLink(req)
-  //       },
-  //       _embedded: {
-  //         products: products.map(product => ({
-  //           id: product.id,
-  //           name: product.name,
-  //           producer: product.producer,
-  //           price: product.price,
-  //           soldout: product.soldout,
-  //           _links: {
-  //             self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
-  //             getById: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
-  //             update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
-  //             delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
-  //           }
-  //         }))
-  //       }
-  //     }
-  //     res
-  //       .json(halResponse)
-  //       .status(200)
-  //       .end()
-  //   } catch (error) {
-  //     next(error)
-  //   }
-  // }
 
   /**
    * Sends a JSON response containing a specific farms's products.

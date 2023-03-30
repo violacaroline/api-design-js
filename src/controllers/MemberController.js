@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken'
 import { MemberModel } from '../models/MemberModel.js'
 import { MemberService } from '../services/MemberService.js'
 import { FarmService } from '../services/FarmService.js'
-import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
+import { HateoasLinkBuilder } from '../util/HateoasLinkBuilder.js'
 
 /**
  * Encapsulates a controller.
