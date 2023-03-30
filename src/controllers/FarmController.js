@@ -7,7 +7,6 @@
 
 import createError from 'http-errors'
 import { FarmService } from '../services/FarmService.js'
-import { ProductService } from '../services/ProductService.js'
 import { HateoasLinkBuilder } from '../util/hateoasLinkBuilder.js'
 
 /**
@@ -22,21 +21,12 @@ export class FarmController {
   #service
 
   /**
-   * The productService.
-   *
-   * @type {ProductService} - The ProductService instance.
-   */
-  #productService
-
-  /**
    * Initializes a new instance.
    *
    * @param {FarmService} service - A service instantiated from a class with the same capabilities as FarmService.
-   * @param {ProductService} productService - A service instantiated from a class with the same capabilities as ProductService.
    */
-  constructor (service = new FarmService(), productService = new ProductService()) {
+  constructor (service = new FarmService()) {
     this.#service = service
-    this.#productService = productService
   }
 
   /**
@@ -80,11 +70,13 @@ export class FarmController {
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, farm.id, farm.name),
-        get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, farm.id, farm.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, farm.id, farm.name),
-        products: HateoasLinkBuilder.getNestedResourceLink(req, farm.id, 'products') // NOT GOOD - HARDCODED???
+        self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', farm.id),
+        get: HateoasLinkBuilder.getNestedResourceLink(req, req.member.id, 'farms'),
+        getById: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', farm.id),
+        create: HateoasLinkBuilder.getNestedResourceCreateLink(req, req.member.id, 'farms'),
+        update: HateoasLinkBuilder.getNestedResourceUpdateLink(req, req.member.id, 'farms', farm.id),
+        delete: HateoasLinkBuilder.getNestedResourceDeleteLink(req, req.member.id, 'farms', farm.id),
+        products: HateoasLinkBuilder.getDoubleNestedResourceLink(req, req.member.id, 'farms', farm.id, 'products')
       },
       _embedded: {
         farm: {
@@ -92,7 +84,7 @@ export class FarmController {
           name: farm.name,
           member: farm.member,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, farm.id)
+            self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', farm.id)
           }
         }
       }
@@ -105,74 +97,38 @@ export class FarmController {
   }
 
   /**
-   * Sends a JSON response containing all farms.
+   * Sends a JSON response containing a specific location's members.
    *
    * @param {object} req - Express request object.
    * @param {object} res - Express response object.
    * @param {Function} next - Express next middleware function.
    */
-  async findAll (req, res, next) {
+  async findFarmsByMember (req, res, next) {
     try {
-      const farms = await this.#service.get()
+      const member = {
+        member: req.params.id
+      }
+      const memberId = req.params.id
+
+      const farmsOfMember = await this.#service.getAllResourcesByFilter(member)
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          self: HateoasLinkBuilder.getNestedResourceLink(req, memberId, 'farms'),
+          create: HateoasLinkBuilder.getNestedResourceCreateLink(req, req.member.id, 'farms')
         },
         _embedded: {
-          farms: farms.map(farm => ({
+          farms: farmsOfMember.map(farm => ({
             id: farm.id,
             name: farm.name,
+            member: farm.member,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, farm.id),
-              getById: HateoasLinkBuilder.getResourceByIdLink(req, farm.id, farm.name),
-              update: HateoasLinkBuilder.getUpdateLink(req, farm.id, farm.name),
-              delete: HateoasLinkBuilder.getDeleteLink(req, farm.id, farm.name),
-              products: HateoasLinkBuilder.getNestedResourceLink(req, farm.id, 'products')
-            }
-          }))
-        }
-      }
-      res
-        .json(halResponse)
-        .status(200)
-        .end()
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  /**
-   * Sends a JSON response containing a specific farms's products.
-   *
-   * @param {object} req - Express request object.
-   * @param {object} res - Express response object.
-   * @param {Function} next - Express next middleware function.
-   */
-  async findProductsByFarm (req, res, next) {
-    try {
-      const farm = {
-        location: req.params.id
-      }
-      const farmId = req.params.id
-
-      const productsOfFarm = await this.#productService.getAllResourcesByFilter(farm)
-
-      const halResponse = {
-        _links: {
-          self: HateoasLinkBuilder.getNestedResourceLink(req, farmId, 'products'),
-          create: HateoasLinkBuilder.getCreateLink(req)
-        },
-        _embedded: {
-          products: productsOfFarm.map(product => ({
-            id: product.id,
-            name: product.name,
-            producer: product.producer,
-            price: product.price,
-            soldout: product.soldout,
-            _links: {
-              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, farmId, 'products', product.id)
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', farm.id),
+              get: HateoasLinkBuilder.getNestedResourceLink(req, req.member.id, 'farms'),
+              getById: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', farm.id),
+              update: HateoasLinkBuilder.getNestedResourceUpdateLink(req, req.member.id, 'farms', farm.id),
+              delete: HateoasLinkBuilder.getNestedResourceDeleteLink(req, req.member.id, 'farms', farm.id),
+              products: HateoasLinkBuilder.getDoubleNestedResourceLink(req, req.member.id, 'farms', farm.id, 'products')
             }
           }))
         }
@@ -202,11 +158,11 @@ export class FarmController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm.id),
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newFarm.id, newFarm.name),
-          update: HateoasLinkBuilder.getUpdateLink(req, newFarm.id, newFarm.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newFarm.id, newFarm.name)
+          self: HateoasLinkBuilder.getNestedResourceCreateLink(req, req.member.id, 'farms'),
+          get: HateoasLinkBuilder.getNestedResourceLink(req, req.member.id, 'farms'),
+          getById: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', newFarm.id),
+          update: HateoasLinkBuilder.getNestedResourceUpdateLink(req, req.member.id, 'farms', newFarm.id),
+          delete: HateoasLinkBuilder.getNestedResourceDeleteLink(req, req.member.id, 'farms', newFarm.id)
         },
         _embedded: {
           farm: {
@@ -214,7 +170,7 @@ export class FarmController {
             name: newFarm.name,
             member: newFarm.member,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newFarm.id)
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', newFarm.id)
             }
           }
         }
@@ -246,17 +202,18 @@ export class FarmController {
     try {
       const { name, member } = req.body
 
-      await this.#service.replace(req.params.id, { name, member })
+      await this.#service.replace(req.params.farmId, { name, member })
 
-      const updatedFarm = await this.#service.getById(req.params.id)
+      const updatedFarm = await this.#service.getById(req.params.farmId)
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm.id),
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedFarm.id, updatedFarm.name),
-          create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedFarm.id, updatedFarm.name)
+          self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', updatedFarm.id),
+          get: HateoasLinkBuilder.getNestedResourceLink(req, req.member.id, 'farms'),
+          getById: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', updatedFarm.id),
+          create: HateoasLinkBuilder.getNestedResourceCreateLink(req, req.member.id, 'farms'),
+          update: HateoasLinkBuilder.getNestedResourceUpdateLink(req, req.member.id, 'farms', updatedFarm.id),
+          delete: HateoasLinkBuilder.getNestedResourceDeleteLink(req, req.member.id, 'farms', updatedFarm.id)
         },
         _embedded: {
           farm: {
@@ -264,7 +221,7 @@ export class FarmController {
             name: updatedFarm.name,
             member: updatedFarm.member,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedFarm.id)
+              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, req.member.id, 'farms', updatedFarm.id)
             }
           }
         }
@@ -294,13 +251,14 @@ export class FarmController {
    */
   async delete (req, res, next) {
     try {
-      const deletedFarmId = req.params.id
+      const deletedFarmId = req.params.farmId
+
       await this.#service.delete(deletedFarmId)
 
       const halResponse = {
         _links: {
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          get: HateoasLinkBuilder.getNestedResourceLink(req, req.member.id, 'farms'),
+          create: HateoasLinkBuilder.getNestedResourceCreateLink(req, req.member.id, 'farms')
         }
       }
 

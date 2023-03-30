@@ -113,14 +113,18 @@ export class ProductController {
    * @param {Function} next - Express next middleware function.
    */
   async find (req, res, next) {
+    const memberId = req.member.id
+    const farmId = req.farm.id
+    const productId = req.product.id
     const product = req.product
 
     const halResponse = {
       _links: {
-        self: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
-        get: HateoasLinkBuilder.getBaseUrlLink(req),
-        update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
-        delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
+        self: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', productId),
+        get: HateoasLinkBuilder.getDoubleNestedResourceLink(req, memberId, 'farms', farmId, 'products'),
+        create: HateoasLinkBuilder.getDoubleNestedResourceCreateLink(req, memberId, 'farms', farmId, 'products'),
+        update: HateoasLinkBuilder.getDoubleNestedResourceUpdateLink(req, memberId, 'farms', farmId, 'products', productId),
+        delete: HateoasLinkBuilder.getDoubleNestedResourceDeleteLink(req, memberId, 'farms', farmId, 'products', productId)
       },
       _embedded: {
         product: {
@@ -130,7 +134,7 @@ export class ProductController {
           price: product.price,
           soldout: product.soldout,
           _links: {
-            self: HateoasLinkBuilder.getPlainResourceLink(req, product.id)
+            self: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', productId)
           }
         }
       }
@@ -142,34 +146,78 @@ export class ProductController {
       .end()
   }
 
+  // /**
+  //  * Sends a JSON response containing all products.
+  //  *
+  //  * @param {object} req - Express request object.
+  //  * @param {object} res - Express response object.
+  //  * @param {Function} next - Express next middleware function.
+  //  */
+  // async findAll (req, res, next) {
+  //   try {
+  //     const products = await this.#service.get()
+
+  //     const halResponse = {
+  //       _links: {
+  //         self: HateoasLinkBuilder.getBaseUrlLink(req),
+  //         create: HateoasLinkBuilder.getCreateLink(req)
+  //       },
+  //       _embedded: {
+  //         products: products.map(product => ({
+  //           id: product.id,
+  //           name: product.name,
+  //           producer: product.producer,
+  //           price: product.price,
+  //           soldout: product.soldout,
+  //           _links: {
+  //             self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
+  //             getById: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
+  //             update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
+  //             delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
+  //           }
+  //         }))
+  //       }
+  //     }
+  //     res
+  //       .json(halResponse)
+  //       .status(200)
+  //       .end()
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
+
   /**
-   * Sends a JSON response containing all products.
+   * Sends a JSON response containing a specific farms's products.
    *
    * @param {object} req - Express request object.
    * @param {object} res - Express response object.
    * @param {Function} next - Express next middleware function.
    */
-  async findAll (req, res, next) {
+  async findProductsByFarm (req, res, next) {
     try {
-      const products = await this.#service.get()
+      const farm = {
+        location: req.farm.id
+      }
+      const memberId = req.member.id
+      const farmId = req.farm.id
+
+      const productsOfFarm = await this.#service.getAllResourcesByFilter(farm)
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          self: HateoasLinkBuilder.getDoubleNestedResourceLink(req, memberId, 'farms', farmId, 'products'),
+          create: HateoasLinkBuilder.getDoubleNestedResourceCreateLink(req, memberId, 'farms', farmId, 'products')
         },
         _embedded: {
-          products: products.map(product => ({
+          products: productsOfFarm.map(product => ({
             id: product.id,
             name: product.name,
             producer: product.producer,
             price: product.price,
             soldout: product.soldout,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, product.id),
-              getById: HateoasLinkBuilder.getResourceByIdLink(req, product.id, product.name),
-              update: HateoasLinkBuilder.getUpdateLink(req, product.id, product.name),
-              delete: HateoasLinkBuilder.getDeleteLink(req, product.id, product.name)
+              self: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', product.id)
             }
           }))
         }
@@ -192,9 +240,12 @@ export class ProductController {
    */
   async create (req, res, next) {
     try {
+      const memberId = req.member.id
+      const farmId = req.farm.id
+
       const newProduct = await this.#service.insert({
         name: req.body.name,
-        producer: req.body.producer,
+        producer: farmId,
         price: req.body.price,
         soldout: req.body.soldout
       })
@@ -205,11 +256,11 @@ export class ProductController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct.id),
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, newProduct.id, newProduct.name),
-          update: HateoasLinkBuilder.getUpdateLink(req, newProduct.id, newProduct.name),
-          delete: HateoasLinkBuilder.getDeleteLink(req, newProduct.id, newProduct.name)
+          self: HateoasLinkBuilder.getDoubleNestedResourceCreateLink(req, memberId, 'farms', farmId, 'products'),
+          get: HateoasLinkBuilder.getDoubleNestedResourceLink(req, memberId, 'farms', farmId, 'products'),
+          getById: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', newProduct.id),
+          update: HateoasLinkBuilder.getDoubleNestedResourceUpdateLink(req, memberId, 'farms', farmId, 'products', newProduct.id),
+          delete: HateoasLinkBuilder.getDoubleNestedResourceDeleteLink(req, memberId, 'farms', farmId, 'products', newProduct.id)
         },
         _embedded: {
           product: {
@@ -219,7 +270,7 @@ export class ProductController {
             price: newProduct.price,
             soldout: newProduct.soldout,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, newProduct.id)
+              self: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', newProduct.id)
             }
           }
         }
@@ -249,11 +300,15 @@ export class ProductController {
    */
   async update (req, res, next) {
     try {
+      const memberId = req.member.id
+      const farmId = req.farm.id
+      const productId = req.params.productId
+
       const { name, producer, price, soldout } = req.body
 
-      await this.#service.replace(req.params.id, { name, producer, price, soldout })
+      await this.#service.replace(productId, { name, producer, price, soldout })
 
-      const updatedProduct = await this.#service.getById(req.params.id)
+      const updatedProduct = await this.#service.getById(productId)
 
       if (updatedProduct.soldout) {
         this.notifyRegisteredWebhookUrls()
@@ -261,11 +316,11 @@ export class ProductController {
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct.id),
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          getById: HateoasLinkBuilder.getResourceByIdLink(req, updatedProduct.id, updatedProduct.name),
-          create: HateoasLinkBuilder.getCreateLink(req),
-          delete: HateoasLinkBuilder.getDeleteLink(req, updatedProduct.id, updatedProduct.name)
+          self: HateoasLinkBuilder.getDoubleNestedResourceUpdateLink(req, memberId, 'farms', farmId, 'products', productId),
+          get: HateoasLinkBuilder.getDoubleNestedResourceLink(req, memberId, 'farms', farmId, 'products'),
+          getById: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', productId),
+          create: HateoasLinkBuilder.getDoubleNestedResourceCreateLink(req, memberId, 'farms', farmId, 'products'),
+          delete: HateoasLinkBuilder.getDoubleNestedResourceDeleteLink(req, memberId, 'farms', farmId, 'products', productId)
         },
         _embedded: {
           product: {
@@ -275,7 +330,7 @@ export class ProductController {
             price: updatedProduct.price,
             soldout: updatedProduct.soldout,
             _links: {
-              self: HateoasLinkBuilder.getPlainResourceLink(req, updatedProduct.id)
+              self: HateoasLinkBuilder.getDoubleNestedResourceByIdLink(req, memberId, 'farms', farmId, 'products', productId)
             }
           }
         }
@@ -305,13 +360,16 @@ export class ProductController {
    */
   async delete (req, res, next) {
     try {
-      const deletedProductId = req.params.id
-      await this.#service.delete(deletedProductId)
+      const memberId = req.member.id
+      const farmId = req.farm.id
+      const productId = req.params.productId
+
+      await this.#service.delete(productId)
 
       const halResponse = {
         _links: {
-          get: HateoasLinkBuilder.getBaseUrlLink(req),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          get: HateoasLinkBuilder.getDoubleNestedResourceLink(req, memberId, 'farms', farmId, 'products'),
+          create: HateoasLinkBuilder.getDoubleNestedResourceCreateLink(req, memberId, 'farms', farmId, 'products')
         }
       }
 

@@ -52,6 +52,7 @@ export class MemberController {
   async loadMember (req, res, next, id) {
     try {
       // Get the Member.
+      console.log('Probs farm id: ', id)
       const member = await this.#service.getById(id)
 
       // If no member found send a 404 (Not Found).
@@ -227,46 +228,6 @@ export class MemberController {
   }
 
   /**
-   * Sends a JSON response containing a specific location's members.
-   *
-   * @param {object} req - Express request object.
-   * @param {object} res - Express response object.
-   * @param {Function} next - Express next middleware function.
-   */
-  async findFarmsByMember (req, res, next) {
-    try {
-      const member = {
-        member: req.params.id
-      }
-      const memberId = req.params.id
-
-      const farmsOfMember = await this.#farmService.getAllResourcesByFilter(member)
-
-      const halResponse = {
-        _links: {
-          self: HateoasLinkBuilder.getNestedResourceLink(req, memberId, 'farms'),
-          create: HateoasLinkBuilder.getCreateLink(req)
-        },
-        _embedded: {
-          farms: farmsOfMember.map(farm => ({
-            name: farm.name,
-            member: farm.member,
-            _links: {
-              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, memberId, 'farms', farm.id)
-            }
-          }))
-        }
-      }
-      res
-        .json(halResponse)
-        .status(200)
-        .end()
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  /**
    * Creates a new member.
    *
    * @param {object} req - Express request object.
@@ -336,6 +297,14 @@ export class MemberController {
    */
   async patch (req, res, next) {
     try {
+      const validProperties = ['name', 'location', 'phone', 'email', 'password']
+      const isBodyValid = Object.keys(req.body).every((key) => validProperties.includes(key))
+
+      if (!isBodyValid) {
+        const error = new Error('Invalid request body')
+        error.name = 'InvalidRequestBody'
+        throw error
+      }
       const { name, location, phone, email, password } = req.body
 
       await this.#service.update(req.params.id, { name, location, phone, email, password })
@@ -369,7 +338,7 @@ export class MemberController {
         .json(halResponse)
         .end()
     } catch (error) {
-      const err = createError(error.name === 'ValidationError'
+      const err = createError(error.name === 'ValidationError' || error.name === 'InvalidRequestBody'
         ? 400 // Bad format
         : 500 // Something went really wrong
       )

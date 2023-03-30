@@ -158,14 +158,13 @@ export class LocationController {
       const location = {
         location: req.params.slug
       }
-      const locationUrlName = req.params.slug
+      const locationSlug = req.params.slug
 
       const membersOfLocation = await this.#memberService.getAllResourcesByFilter(location)
 
       const halResponse = {
         _links: {
-          self: HateoasLinkBuilder.getNestedResourceBySlugLink(req, locationUrlName, 'members'),
-          create: HateoasLinkBuilder.getCreateLink(req)
+          self: HateoasLinkBuilder.getNestedResourceBySlugLink(req, locationSlug, 'members')
         },
         _embedded: {
           members: membersOfLocation.map(member => ({
@@ -173,7 +172,7 @@ export class LocationController {
             name: member.name,
             location: member.location,
             _links: {
-              self: HateoasLinkBuilder.getNestedResourceByIdLink(req, locationUrlName, 'members', member.id)
+              self: HateoasLinkBuilder.getIndependentResourceInNestedResourceLink(req, 'members', member.id)
             }
           }))
         }
